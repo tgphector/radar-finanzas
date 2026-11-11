@@ -49,7 +49,7 @@ Eres mi socio de desarrollo para construir Radar, una web personal de herramient
 Directo, breve, en español. Si mi idea complica el proyecto o choca con una decisión anterior, dímelo claro.
 
 ## Estado actual
-Actualizado: 11 nov 2026, cierre de la S2 de E1.
+Actualizado: 11 nov 2026, cierre de la S2 de E1 y registro de dos ideas nuevas (buscador de símbolos y "Fundamentales").
 
 **En curso:** E1 · Esqueleto + Mis gráficas. Sesiones 1 y 2 de 3 hechas.
 
@@ -66,10 +66,11 @@ Actualizado: 11 nov 2026, cierre de la S2 de E1.
 **Próxima sesión (S3 de E1, la última del entregable)**
 1. Gráfico grande con selector 1d / 5d / 1m / 1a / 5a. Reemplaza al gráfico simple que hoy abre el chip (`pintarGrafico()` en `graficas.js`).
 2. Pruebas finales de E1 contra la definición de terminado (sección 14 de `docs/arquitectura.md`): laptop, celular, sin conexión, localStorage bloqueado.
-3. Si sobra tiempo (recortable): editar favoritos desde la interfaz.
+3. Buscador de símbolos: si el widget elegido para el gráfico grande trae buscador propio, activarlo (detalle en `docs/backlog.md`). No construir uno propio.
+4. Si sobra tiempo (recortable): editar favoritos desde la interfaz.
 
 **Decisiones que debo preguntarle a Héctor al iniciar la S3**
-1. Qué widget usar para el gráfico grande: uno liviano con periodos propios o el gráfico avanzado de TradingView. Llevar 2-3 opciones probadas, con su peso y cómo se ven en celular.
+1. Qué widget usar para el gráfico grande: uno liviano con periodos propios o el gráfico avanzado de TradingView. Llevar 2-3 opciones probadas, con su peso, cómo se ven en celular y si traen buscador de símbolos.
 2. Dónde se abre el gráfico grande: debajo de los chips (como hoy) o en un panel que tape la pantalla en celular.
 3. Si los favoritos también abren el gráfico grande al pulsarlos.
 

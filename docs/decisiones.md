@@ -4,6 +4,8 @@ Una línea por decisión. Lo más nuevo arriba.
 
 | Fecha | Decisión | Motivo |
 |---|---|---|
+| 11 nov 2026 | Buscador de símbolos: si el widget del gráfico grande de la S3 trae buscador propio, se activa dentro de la S3. No se construye un buscador propio en E1. "Agregar el símbolo buscado a mi lista" queda en el backlog como funcionalidad aparte, sin entregable asignado | Idea de Héctor. Activar una opción del widget no cambia el plan; guardar símbolos propios sí (campo propio, memoria y validación) |
+| 11 nov 2026 | Entregable nuevo y tentativo "Fundamentales" después de E3: tabla propia con P/E, P/E forward y otras métricas, con datos traídos por Apps Script desde una API y guardados en Sheets. Los ETFs llevan sus propias métricas porque normalmente no tienen P/E. La API no está elegida | Idea de Héctor. El widget de cotizaciones no permite columnas propias. El plan de E1 a E3 no cambia |
 | 11 nov 2026 | Los favoritos son independientes del botón "Editar": apagar un símbolo lo quita de la tabla y de los chips, pero su tarjeta de favorito sigue visible | Sería raro que un favorito desaparezca por un interruptor de la tabla. Ajusta la regla "un widget solo se crea si el símbolo está activo": aplica a la tabla, no a los favoritos |
 | 11 nov 2026 | La sección de la tabla se llama "Todos los símbolos" | Se distingue de "Favoritos" sin usar jerga |
 | 11 nov 2026 | Un símbolo que no carga en TradingView lleva `"sinDatos": true` en `simbolos.json`: sale de la tabla y se ve como chip gris "Sin datos en TradingView". Cada caso se anota en Pendientes para que Héctor decida si lo quita | El widget omite un símbolo inválido sin avisar y la página no puede leer el iframe, así que la marca tiene que ser manual |
@@ -55,5 +57,8 @@ Una línea por decisión. Lo más nuevo arriba.
 | 10 nov 2026 | Construcción por entregables sobre un esqueleto mínimo | Práctica validada (walking skeleton, Shape Up) |
 
 ## Pendientes
+- Elegir la API de "Fundamentales" y confirmar sus límites y términos (lista de candidatas en `docs/backlog.md`); verla junto con la API de precios de E4.
+- Fijar en la revisión posterior a E3 el número de "Fundamentales" y su orden frente a E4 (Mis reglas).
+- En la S3: comprobar si el widget elegido para el gráfico grande trae buscador de símbolos.
 - Símbolos "sin datos en TradingView" por decidir: ninguno (11 nov 2026).
 - Confirmar si la SBS permite leer las tasas con un script (E2/E3).
