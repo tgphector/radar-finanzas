@@ -11,7 +11,7 @@ import { crear, encabezado, aviso } from "./ui.js";
 import { graficas } from "../modulos/graficas/graficas.js";
 
 // --- 1. Registro de módulos (el orden es el del menú) ---
-// Cada módulo cumple el contrato de 2-arquitectura.md, sección 7.
+// Cada módulo cumple el contrato de docs/arquitectura.md, sección 7.
 // "proximamente: true" = aparece en el menú pero aún no está construido.
 const MODULOS = [
   graficas,

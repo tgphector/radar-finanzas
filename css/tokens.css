@@ -2,7 +2,7 @@
    tokens.css · Design system de Radar
    Aquí viven los valores que se repiten en toda la página
    (colores, espacios, tipografía). Si cambia un color, se
-   cambia solo aquí. Referencia: 2-arquitectura.md, sección 10.
+   cambia solo aquí. Referencia: docs/arquitectura.md, sección 10.
    ============================================================ */
 
 :root {

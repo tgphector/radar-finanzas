@@ -1,6 +1,6 @@
 {
-  "nota": "Lista de símbolos de Mis gráficas. Referencia: 2-arquitectura.md, sección 11. 'tv' es el símbolo con su bolsa en formato TradingView.",
-  "revisado": "2026-11-10",
+  "nota": "Lista de símbolos de Mis gráficas. Referencia: docs/arquitectura.md, sección 11. 'tv' es el símbolo con su bolsa en formato TradingView. Un símbolo que no carga en TradingView lleva \"sinDatos\": true y se muestra en gris.",
+  "revisado": "2026-11-11",
   "favoritos": ["IVV", "IVW", "NVDA", "EPU", "IEMG", "BAP"],
   "pestanas": [
     {
@@ -59,7 +59,7 @@
         { "simbolo": "INGM", "tv": "NYSE:INGM", "nombre": "Ingram Micro" },
         { "simbolo": "PRYMY", "tv": "OTC:PRYMY", "nombre": "Prysmian (ADR)" },
         { "simbolo": "QUBT", "tv": "NASDAQ:QUBT", "nombre": "Quantum Computing Inc." },
-        { "simbolo": "QBTS", "tv": "NYSE:QBTS", "nombre": "D-Wave Quantum" },
+        { "simbolo": "QBTS", "tv": "NASDAQ:QBTS", "nombre": "D-Wave Quantum" },
         { "simbolo": "RGTI", "tv": "NASDAQ:RGTI", "nombre": "Rigetti Computing" }
       ]
     },

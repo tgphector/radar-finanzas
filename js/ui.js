@@ -90,3 +90,67 @@ export function ayuda(termino, explicacion) {
   boton.addEventListener("blur", () => boton.setAttribute("aria-expanded", "false"));
   return boton;
 }
+
+// ------------------------------------------------------------
+// Piezas agregadas en la S2 de E1
+// ------------------------------------------------------------
+
+// Botón secundario con texto. "alPulsar" es la función que se ejecuta al hacer clic.
+export function boton(texto, alPulsar) {
+  const elemento = crear("button", { clase: "boton", texto, atributos: { type: "button" } });
+  elemento.addEventListener("click", alPulsar);
+  return elemento;
+}
+
+// Pestañas. opciones: [{ id, nombre }]; "activa" es el id de la pestaña abierta.
+// Al pulsar una, se marca y se llama a alCambiar(id).
+export function pestanas(opciones, activa, alCambiar) {
+  const fila = crear("div", { clase: "pestanas", atributos: { role: "tablist" } });
+  for (const opcion of opciones) {
+    const pestana = crear("button", {
+      clase: "pestana",
+      texto: opcion.nombre,
+      atributos: { type: "button", role: "tab", "aria-selected": String(opcion.id === activa) }
+    });
+    pestana.addEventListener("click", () => {
+      for (const otra of fila.children) otra.setAttribute("aria-selected", String(otra === pestana));
+      alCambiar(opcion.id);
+    });
+    fila.append(pestana);
+  }
+  return fila;
+}
+
+// Chip: etiqueta redonda que se puede pulsar.
+// elegido: se pinta resaltado. apagado: en gris y sin clic (por ejemplo, "sin datos").
+export function chip(texto, { titulo, elegido = false, apagado = false, alPulsar } = {}) {
+  const elemento = crear("button", { clase: "chip", texto, atributos: { type: "button" } });
+  if (titulo) elemento.title = titulo;
+  if (apagado) {
+    elemento.disabled = true;
+    return elemento;
+  }
+  elemento.setAttribute("aria-pressed", String(elegido));
+  if (alPulsar) elemento.addEventListener("click", alPulsar);
+  return elemento;
+}
+
+// Interruptor de encendido / apagado. Llama a alCambiar(true | false).
+// role="switch" le dice al lector de pantalla que es un interruptor.
+export function interruptor(etiqueta, encendido, alCambiar, titulo) {
+  const elemento = crear("button", {
+    clase: "interruptor",
+    atributos: { type: "button", role: "switch", "aria-checked": String(encendido) }
+  });
+  if (titulo) elemento.title = titulo;
+  elemento.append(
+    crear("span", { clase: "interruptor__riel", atributos: { "aria-hidden": "true" } }),
+    crear("span", { texto: etiqueta })
+  );
+  elemento.addEventListener("click", () => {
+    const nuevo = elemento.getAttribute("aria-checked") !== "true";
+    elemento.setAttribute("aria-checked", String(nuevo));
+    alCambiar(nuevo);
+  });
+  return elemento;
+}

@@ -2,7 +2,7 @@
    componentes.css · Piezas reutilizables
    Cada módulo arma su pantalla con estas piezas (vía ui.js).
    Un módulo NO crea estilos propios: si falta una pieza, se
-   agrega aquí y se anota en 4-decisiones.md.
+   agrega aquí y se anota en docs/decisiones.md.
    ============================================================ */
 
 /* --- Tarjeta: caja base de casi todo --- */
@@ -58,7 +58,8 @@
 }
 
 /* El widget ocupa toda la tarjeta y queda encima del texto de espera */
-.tarjeta--grafico .tradingview-widget-container {
+.tarjeta--grafico .tradingview-widget-container,
+.tarjeta--tabla .tradingview-widget-container {
   position: relative;
   width: 100%;
   height: 100%;
@@ -68,7 +69,7 @@
    Cuando no coinciden, el navegador pinta un fondo blanco detrás del
    widget aunque sea transparente. Con "normal" el fondo vuelve a ser
    el de la tarjeta. */
-.tarjeta--grafico iframe { color-scheme: normal; }
+.tradingview-widget-container iframe { color-scheme: normal; }
 
 /* --- Línea de fuente y fecha (obligatoria en cada bloque de datos) --- */
 .fuente {
@@ -148,3 +149,177 @@
 .ayuda:hover .ayuda__texto,
 .ayuda:focus-visible .ayuda__texto,
 .ayuda[aria-expanded="true"] .ayuda__texto { display: block; }
+
+/* ============================================================
+   Piezas agregadas en la S2 de E1: barra de herramientas, botón,
+   pestañas, chips, interruptor y tarjeta para la tabla.
+   ============================================================ */
+
+/* --- Barra: pestañas a la izquierda y botón a la derecha --- */
+.barra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e1) var(--e2);
+  margin-bottom: var(--e2);
+}
+
+/* --- Botón secundario --- */
+.boton {
+  min-height: var(--toque);
+  padding: 0 var(--e2);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  color: var(--acento);
+  font: inherit;
+  cursor: pointer;
+}
+
+.boton:hover { border-color: var(--acento); }
+
+/* --- Pestañas: una fila; en celular se desliza de lado --- */
+.pestanas {
+  display: flex;
+  gap: var(--e1);
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.pestana {
+  flex: none;
+  min-height: var(--toque);
+  padding: 0 var(--e2);
+  border: 1px solid transparent;
+  border-radius: var(--radio);
+  background: none;
+  color: var(--texto-2);
+  font: inherit;
+  cursor: pointer;
+}
+
+.pestana:hover { color: var(--texto); }
+
+.pestana[aria-selected="true"] {
+  background: var(--acento-suave);
+  color: var(--acento);
+}
+
+/* --- Tarjeta que contiene la tabla de cotizaciones ---
+   El alto lo pone el módulo según el número de filas. En celular la
+   tabla no cabe: la tarjeta se desliza de lado (overflow-x) y el widget
+   conserva un ancho mínimo para que las columnas no se aplasten. */
+.tarjeta--tabla {
+  position: relative;
+  padding: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.tarjeta--tabla .tradingview-widget-container { min-width: 680px; }
+
+/* --- Chips: fila de etiquetas que se pueden pulsar --- */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--e1);
+  margin-top: var(--e2);
+}
+
+.chip {
+  min-height: var(--toque);
+  padding: 0 var(--e2);
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+  font-size: var(--t-chico);
+  cursor: pointer;
+}
+
+.chip:hover { border-color: var(--acento); }
+
+.chip[aria-pressed="true"] {
+  border-color: var(--acento);
+  background: var(--acento-suave);
+  color: var(--acento);
+}
+
+/* Chip en gris: símbolo sin datos (no se puede pulsar) */
+.chip:disabled {
+  border-style: dashed;
+  background: none;
+  color: var(--texto-2);
+  cursor: default;
+}
+
+.chip:disabled:hover { border-color: var(--borde); }
+
+/* --- Interruptor: encendido / apagado de un símbolo --- */
+.interruptor {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e1);
+  min-height: var(--toque);
+  padding: 0 12px 0 var(--e1);
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--texto-2);
+  font: inherit;
+  font-size: var(--t-chico);
+  cursor: pointer;
+}
+
+/* El riel y la bolita del interruptor */
+.interruptor__riel {
+  position: relative;
+  flex: none;
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--borde);
+}
+
+.interruptor__riel::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--texto-2);
+  transition: transform 0.15s;
+}
+
+.interruptor[aria-checked="true"] { color: var(--texto); }
+.interruptor[aria-checked="true"] .interruptor__riel { background: var(--acento-suave); }
+.interruptor[aria-checked="true"] .interruptor__riel::after {
+  background: var(--acento);
+  transform: translateX(16px);
+}
+
+/* --- Nota chica debajo de un bloque --- */
+.nota {
+  margin-top: var(--e1);
+  color: var(--texto-2);
+  font-size: var(--t-chico);
+}
+
+/* --- Cabecera de un panel: título a la izquierda, botón a la derecha --- */
+.panel__cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--e2);
+  margin: var(--e3) 0 var(--e1);
+}
+
+.panel__titulo { font-size: var(--t-base); font-weight: 600; }
+.panel__titulo span { color: var(--texto-2); font-weight: 400; }
+
+/* Gráfico del símbolo elegido: más alto que el de una tarjeta */
+.tarjeta--grafico-panel { height: 320px; }
