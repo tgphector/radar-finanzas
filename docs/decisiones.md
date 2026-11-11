@@ -4,6 +4,16 @@ Una línea por decisión. Lo más nuevo arriba.
 
 | Fecha | Decisión | Motivo |
 |---|---|---|
+| 11 nov 2026 | **E3 se replanifica antes de empezarlo.** La SBS bloquea la lectura automática (protección contra robots): no funcionó con un pedido simple, con un navegador automático ni con `UrlFetchApp` desde Apps Script. Alternativas a evaluar: GitHub Actions, carga manual rápida por capturas, frecuencia quincenal y buscar un archivo descargable de la SBS. No se intenta saltar la protección | Comprobado por Héctor en Apps Script (302, 122 caracteres) y por Claude desde su entorno. Detalle en `docs/backlog.md`, E3 |
+| 11 nov 2026 | Datos de plazo fijo que mantiene Radar: Lima, soles y dólares, los cuatro montos de la SBS (8 tablas), con carga manual quincenal. La fecha de los datos debe verse claramente en la página | Es lo mínimo para que el simulador tenga sentido; más regiones multiplican el trabajo manual |
+| 11 nov 2026 | Simulador sin selector de plazo. El usuario escribe cualquier monto, se usa la tasa del tramo de monto más cercano y el resultado se marca como "estimado". Reemplaza a "Simulador: monto, plazo, moneda, tipo de entidad" | La SBS solo publica 360 días y cuatro montos; no se inventan opciones que la fuente no tiene |
+| 11 nov 2026 | Columnas de `tasas_pf`: `entidad`, `tipo`, `moneda`, `plazo_dias`, `monto`, `trea`, `fsd`, `region`, `fecha_sbs`. Se quita `tea` | La SBS publica solo entidad y TREA; la tasa depende de la región y la SBS da su propia fecha |
+| 11 nov 2026 | Hoja `fuentes` con columnas `recurso`, `nombre`, `url`, `frecuencia`, `actualizado`, `estado`, `nota`: de ahí salen la fuente, la fecha y el estado de cada respuesta de la app web. Hoja `fsd`: `monto`, `moneda`, `vigente_desde`, `vigente_hasta`, `fuente`. Hoja `log`: `fecha`, `funcion`, `resultado`, `mensaje` | Una fila por recurso; la app web no necesita saber nada más |
+| 11 nov 2026 | El tipo de entidad se deduce del nombre que da la SBS (Banco, Caja municipal para CMAC y CMCP, Caja rural para CRAC, Financiera) y se corrige a mano cuando el nombre no lo dice | La SBS no publica el tipo en esa tabla |
+| 11 nov 2026 | La página sí logra leer la app web de Apps Script desde GitHub Pages. Se descarta el plan B (JSON en el repositorio). La dirección de la app web va en `js/config.js` y es pública | Probado desde el origen de la página publicada: 33 filas en 1.6 segundos |
+| 11 nov 2026 | `datos.js` guarda la última respuesta buena en el navegador (`radar.datos.<recurso>`) y la devuelve marcada como copia si la app web falla. Una respuesta vacía o con error no pisa la copia | Regla de producto: si un dato no se pudo actualizar, se muestra el último con su fecha |
+| 11 nov 2026 | Claude crea y llena el archivo "Radar · Base de datos" con el conector de Google Sheets; Héctor pega los `.gs` y publica la app web | Reparto acordado al iniciar E2 |
+| 11 nov 2026 | Reparto de E2: S1 datos y API; S2 ranking y FSD; S3 simulador y pruebas | Acordado con Héctor |
 | 11 nov 2026 | **E1 terminado.** Cumple la definición de terminado completa; Héctor confirmó que lo usó al menos 3 veces | Cierre del entregable |
 | 11 nov 2026 | Gráfico grande: widget "Advanced Chart" de TradingView (`embed-widget-advanced-chart.js`), tema oscuro, gráfico de área, abre en 1 año. Trae sus propios periodos (1D, 5D, 1M, 1A, 5A y además 3M, 6M, YTD y Todos, que no se pueden quitar) | Es el único widget probado que reúne selector de periodos, tema oscuro y buscador. Pesa más (~5 MB) pero solo se carga al pulsar un símbolo. Alternativa descartada: "Symbol Overview" (más liviano y con línea cian, pero sin buscador) |
 | 11 nov 2026 | Buscador de símbolos activado con la lupa del gráfico grande (`allow_symbol_change`). El título de Radar muestra el símbolo con el que se abrió el gráfico y una nota explica la lupa | Radar no puede leer qué se busca dentro del widget. Que el título siga a la búsqueda queda como mejora menor en el backlog |
@@ -69,4 +79,6 @@ Una línea por decisión. Lo más nuevo arriba.
 - Elegir la API de "Fundamentales" y confirmar sus límites y términos (lista de candidatas en `docs/backlog.md`); verla junto con la API de precios de E4.
 - Fijar en la revisión posterior a E3 el número de "Fundamentales" y su orden frente a E4 (Mis reglas).
 - Símbolos "sin datos en TradingView" por decidir: ninguno (11 nov 2026).
-- Confirmar si la SBS permite leer las tasas con un script (E2/E3).
+- Replanificar E3 antes de empezarlo (alternativas en `docs/backlog.md`).
+- Cargar las 7 tablas de la SBS que faltan (soles: S/ 2 500, 5 000 y 20 000; dólares: las cuatro condiciones). Héctor pasa las capturas en la S2.
+- Llenar la hoja `fsd` con el monto de cobertura vigente y marcar qué entidades son miembros del FSD (S2).

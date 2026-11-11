@@ -9,8 +9,8 @@ Después de cada entregable: usarlo al menos 3 veces antes de dar por cerrado el
 | Entregable | Contenido | Sesiones | Estado |
 |---|---|---|---|
 | E1 | Esqueleto + Mis gráficas, publicado en GitHub Pages | 3 (S1 a S3) | **Terminado (11 nov 2026)** |
-| E2 | Plazos fijos (con `Api.gs` leyendo Sheets) | 3 | Siguiente · empieza en la S1 |
-| E3 | Datos automáticos con Apps Script + PWA | 3 | Pendiente |
+| E2 | Plazos fijos (con `Api.gs` leyendo Sheets) | 3 (S1 a S3) | En curso · S1 hecha, sigue S2 |
+| E3 | Datos automáticos con Apps Script + PWA | 3 | Pendiente · **por replanificar**: la SBS bloquea la lectura automática |
 | Revisión | ¿Se usa? ¿Sigue el ritmo? ¿Qué sigue? | 1, al terminar E3 | — |
 | Fundamentales | Tabla propia con P/E, P/E forward y otras métricas (Apps Script + API + Sheets) | 3 | Tentativo · después de E3; su número y su orden frente a E4 se fijan en la revisión |
 | E4 | Mis reglas | 3 | Tentativo |
@@ -37,22 +37,34 @@ Cerrado el 11 nov 2026 con la definición de terminado completa (sección 14 de 
 - **Riesgo:** algún símbolo no disponible en los widgets gratuitos de TradingView.
 
 ### E2 · Plazos fijos
-- Ranking por TREA a 1 año, con selector soles / dólares, fuente y fecha SBS.
-- Simulador: monto, plazo, moneda y tipo de entidad (opciones según SBS). Al simular, el nuevo ranking reemplaza al de arriba.
-- Etiqueta "Cubierto por el FSD" con el monto vigente de la fuente oficial.
-- Resultados marcados como "estimado" cuando la SBS no publica la tasa exacta.
-- Crear el archivo **"Radar · Base de datos"** en Google Sheets con las hojas `tasas_pf`, `fsd`, `fuentes` y `log`; llenar `tasas_pf` a mano (con ayuda de Claude) en esta etapa.
-- **`Api.gs` con `doGet`** publicado como app web: entrega `tasas` y `fsd` en JSON con caché. `datos.js` y `config.js` en la página leen esa app web. Una sola copia de los datos: la hoja.
-- **Primer paso:** revisar qué tablas publica la SBS (plazos, montos, monedas) y definir las columnas de `tasas_pf`.
+
+| Sesión | Qué se construye | Qué queda funcionando | Estado |
+|---|---|---|---|
+| S1 | Revisar qué publica la SBS, archivo "Radar · Base de datos" con `tasas_pf`, `fsd`, `fuentes` y `log`, `Api.gs` publicado como app web, `config.js` y `datos.js` | La página publicada logra leer las tasas de la hoja a través de la app web | **Hecha (11 nov 2026).** 33 entidades cargadas (Lima, soles, S/ 10 000 a 360 días). Lectura comprobada desde el origen de la página publicada. Plazos fijos sigue como "Próximamente" |
+| S2 | Cargar las 7 tablas que faltan. Ranking por TREA con selector soles / dólares, fecha de los datos bien visible, etiqueta "Cubierto por el FSD", ayudas "?" en TREA y FSD | #/plazos muestra el ranking real con fuente y fecha | Siguiente |
+| S3 | Simulador y pruebas (sin conexión, app web caída, hoja vacía, celular) | E2 terminado según la definición de terminado | Pendiente |
+
+- **Qué publica la SBS** (aplicativo "Costo y Rendimiento de Productos Financieros", revisado el 11 nov 2026): por región, producto (plazo fijo en soles o en dólares) y condición, una tabla con entidad y TREA. En soles hay cuatro condiciones: S/ 2 500, 5 000, 10 000 y 20 000, todas a 360 días. La SBS registra la TREA mínima aplicable al producto. No publica TEA, tipo de entidad ni cobertura del FSD. Las condiciones en dólares están por ver.
+- **Datos que mantiene Radar:** Lima, soles y dólares, los cuatro montos (8 tablas). Carga manual quincenal a partir de capturas de Héctor. La fecha de los datos debe verse claramente en la página.
+- **Ranking:** por TREA a 360 días, con selector soles / dólares, fuente y fecha de la SBS.
+- **Simulador:** sin selector de plazo (la SBS solo publica 360 días). El usuario escribe cualquier monto, se usa la tasa del tramo de monto más cercano y el resultado sale marcado como "estimado". Moneda y tipo de entidad como filtros. Al simular, el nuevo ranking reemplaza al de arriba.
+- **Etiqueta "Cubierto por el FSD"** con el monto vigente de la fuente oficial. La columna `fsd` de cada entidad está vacía hasta verificarla con la lista del FSD.
 - **Recortable:** filtro por tipo de entidad.
-- **Plan B:** si la página no logra leer la app web, las tasas van en un archivo JSON del repositorio hasta E3.
+- **Plan B descartado:** la página sí logra leer la app web; no hace falta el archivo JSON en el repositorio.
 
 ### E3 · Datos automáticos (Apps Script) + PWA
-- **Apps Script:** `ActualizarTasas.gs` lee la SBS con `UrlFetchApp` y escribe en `tasas_pf` y `historial_tasas`; activador diario a las 8:00; errores a la hoja `log`.
+- **POR REPLANIFICAR antes de empezar E3.** El plan original (abajo) no funciona: el 11 nov 2026 se comprobó que la SBS protege su sitio contra robots (Incapsula). Un pedido simple, un navegador automático y `UrlFetchApp` desde Apps Script reciben una pantalla de verificación en lugar de las tablas (Apps Script: código 302 y 122 caracteres).
+- **Alternativas a evaluar en la replanificación:**
+  1. Leer la SBS desde GitHub Actions. Dudas: es probable que reciba el mismo bloqueo, por salir también de servidores; saltarse la protección no es una opción. Además, GitHub Actions se había dejado fuera del stack (ver `docs/arquitectura.md`, sección 0), así que usarlo es una decisión nueva.
+  2. Carga manual rápida por capturas: Héctor pasa capturas de las 8 tablas y Claude las transcribe a la hoja. Es lo que ya funciona en E2. Mejoras posibles: probar la exportación a Excel del aplicativo de la SBS y un paso de control (número de entidades y fecha) antes de reemplazar los datos.
+  3. Frecuencia quincenal en lugar de diaria (ya decidida para E2).
+  4. Buscar si la SBS publica las mismas tasas en un archivo descargable o en datos abiertos, sin protección.
+- **Lo que sigue en pie de E3:** `historial_tasas` (se puede llenar en cada carga manual), copia del código `.gs`, PWA, contador de visitas. El correo de alerta pierde sentido sin actualización automática; se puede cambiar por un aviso en la página cuando los datos tengan más de 15 días.
+- **Plan original (no vigente):** `ActualizarTasas.gs` lee la SBS con `UrlFetchApp` y escribe en `tasas_pf` y `historial_tasas`; activador diario a las 8:00; errores a la hoja `log`.
 - Copia del código `.gs` en `/apps-script` del repositorio.
 - Radar instalable como app (PWA), contador de visitas sin cookies y correo de alerta si la actualización falla dos días seguidos.
 - **Recortable:** PWA, contador y correo pasan a E4 si no caben.
-- **Riesgo:** si la SBS no se puede leer con un script, la hoja se llena a mano una vez por semana y se documenta.
+- **Riesgo confirmado:** la SBS no se puede leer con un script (ver arriba).
 
 ### E4 · Mis reglas
 - El usuario registra posiciones y objetivos (en su navegador): "salir con +10%", "revisar cada mes".

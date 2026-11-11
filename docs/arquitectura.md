@@ -1,4 +1,6 @@
-# Arquitectura de Radar (v6, 11 nov 2026 · cierre de E1)
+# Arquitectura de Radar (v7, 11 nov 2026 · cierre de la S1 de E2)
+
+Cambios de v7: columnas reales de las hojas, `Api.gs` publicado, `config.js` y `datos.js` construidos, la SBS bloquea la lectura automática (E3 por replanificar).
 
 Cambios de v6: gráfico grande con el widget avanzado de TradingView (periodos y buscador), panel a pantalla completa en celular, botón "Ampliar" en favoritos, tabla limitada a 780 px.
 
@@ -23,7 +25,7 @@ Un **esqueleto fijo** (menú, estilos, datos, memoria) y **módulos independient
 | Código de la página | HTML + CSS + JavaScript sin frameworks, con módulos (`import` / `export`) | Simple, sin instalaciones |
 | Publicación | Claude sube cada parte al repositorio (rama `main`); Pages publica solo en ~1 min | Héctor revisa el enlace publicado, no archivos sueltos |
 | Base de datos | **Google Sheets** (un archivo exclusivo para Radar) | Tasas, FSD, historial, precios, registro de ejecuciones. Visible y corregible a mano |
-| Actualización de datos | **Google Apps Script** con activador diario | Lee la SBS (y luego otras fuentes) con `UrlFetchApp` y escribe en Sheets |
+| Actualización de datos | Carga manual quincenal de las tasas (la SBS bloquea la lectura automática; E3 por replanificar). **Google Apps Script** con activador para las fuentes que sí se puedan leer | Mantener Sheets al día |
 | API de datos | Apps Script publicado como **app web** (`doGet`) | Entrega los datos de Sheets a la página en JSON |
 | Datos personales | Navegador del usuario (localStorage) | Favoritos, símbolos activos y, desde E4, reglas y posiciones |
 | Secretos | `PropertiesService` de Apps Script | Clave de la API de precios (E4); nunca en la página |
@@ -42,7 +44,7 @@ Un solo lugar desde E1: **GitHub Pages**, repositorio público `tgphector/radar-
 | Entregable | Datos |
 |---|---|
 | E1 | Sin datos propios: todo sale de los widgets de TradingView |
-| E2 | Archivo "Radar · Base de datos" en Sheets, `tasas_pf` llenada a mano. `Api.gs` con `doGet` entrega la hoja en JSON y la página la lee con `datos.js`. Plan B si la página no logra leer la app web: archivo JSON en el repositorio hasta E3 |
+| E2 | Archivo "Radar · Base de datos" en Sheets, `tasas_pf` llenada a mano. `Api.gs` con `doGet` entrega la hoja en JSON y la página la lee con `datos.js` (comprobado el 11 nov 2026 desde la página publicada) |
 | E3 en adelante | Apps Script actualiza Sheets cada día; la página sigue leyendo el mismo JSON |
 
 ## 4. Google Sheets: estructura de la base de datos
@@ -50,10 +52,10 @@ Archivo: **"Radar · Base de datos"** (solo para Radar; nada personal adentro).
 
 | Hoja | Contenido | Quién escribe |
 |---|---|---|
-| `tasas_pf` | Último dato de tasas de plazo fijo: entidad, tipo, moneda, plazo_dias, monto, tea, trea, fsd | Apps Script (o Héctor a mano) |
+| `tasas_pf` | Último dato de tasas de plazo fijo: `entidad`, `tipo`, `moneda`, `plazo_dias`, `monto`, `trea`, `fsd`, `region`, `fecha_sbs`. Una fila por entidad y condición de la SBS | Carga manual (Claude con el conector de Sheets, a partir de capturas de Héctor) |
 | `historial_tasas` | Una fila por entidad, plazo y día; se agrega, nunca se borra | Apps Script |
 | `fsd` | Monto de cobertura vigente, fecha y fuente | Héctor a mano (cambia pocas veces al año) |
-| `fuentes` | Nombre, URL, frecuencia, última actualización y estado de cada fuente | Apps Script |
+| `fuentes` | Una fila por recurso: `recurso`, `nombre`, `url`, `frecuencia`, `actualizado`, `estado`, `nota` | Quien cargue los datos |
 | `log` | Fecha, función, resultado (ok/error) y mensaje de cada ejecución | Apps Script |
 | `precios` (E4) | Precio de cierre por símbolo y fecha | Apps Script |
 
@@ -68,13 +70,14 @@ Proyecto vinculado al archivo de Sheets.
 ```
 Radar (Apps Script)
 ├── Api.gs              # (E2) doGet(e): ?recurso=tasas|fsd|precios → JSON con fuente, fecha y estado
-├── ActualizarTasas.gs  # (E3) Lee la SBS, interpreta la tabla y escribe tasas_pf + historial_tasas
+├── ActualizarTasas.gs  # (E3, por replanificar) La SBS bloquea la lectura con UrlFetchApp
 ├── ActualizarPrecios.gs  # (E4) Trae precios de cierre de la API y escribe en precios
 ├── Utilidades.gs       # Leer/escribir hojas, registrar en log, caché
 └── Configuracion.gs    # Crear activadores y guardar la clave de API en PropertiesService
 ```
 
-- **Activador:** diario a las 8:00 (hora de Lima) para tasas; diario al cierre de mercado para precios (E4).
+- **Activador:** las tasas no tienen activador (carga manual quincenal); diario al cierre de mercado para precios (E4).
+- **Estado (11 nov 2026):** `Api.gs` y `Utilidades.gs` están publicados como app web. Si se cambia el código, hay que crear una versión nueva de la implementación para que la dirección `/exec` lo tome. `limpiarCache()` borra la caché de 5 minutos después de corregir la hoja.
 - **Publicación:** app web con "Ejecutar como: yo" y "Acceso: cualquier persona". Solo entrega datos públicos de Sheets; nunca escribe.
 - **Caché:** `CacheService` guarda la respuesta unos minutos para que la página cargue rápido.
 - **Respaldo del código:** copia de los archivos `.gs` en la carpeta `/apps-script` del repositorio (manual al terminar cada entregable; más adelante, con `clasp`).
@@ -95,8 +98,8 @@ radar-finanzas/
 │   ├── app.js                 # Arranque, router (#/graficas, #/plazos), registro       (E1 ✔)
 │   ├── memoria.js             # Capa de almacenamiento personal (sección 9)             (E1 ✔)
 │   ├── ui.js                  # Componentes reutilizables                               (E1 ✔)
-│   ├── config.js              # URL de la app web de Apps Script                        (E2)
-│   └── datos.js               # Pide el JSON, maneja errores y muestra la fecha         (E2)
+│   ├── config.js              # URL de la app web de Apps Script                        (E2 ✔)
+│   └── datos.js               # Pide el JSON y, si falla, devuelve la última copia      (E2 ✔)
 ├── modulos/
 │   ├── graficas/
 │   │   ├── graficas.js        #                                                         (E1 ✔)
@@ -110,7 +113,7 @@ radar-finanzas/
 │   └── investigacion.md       # Contexto histórico
 ├── manifest.json              # Instalar Radar como app (PWA)                           (E3)
 ├── sw.js                      # Carga rápida y uso básico sin conexión                  (E3)
-└── apps-script/               # Copia de respaldo del código .gs                        (E2/E3)
+└── apps-script/               # Copia de respaldo: Api.gs y Utilidades.gs               (E2 ✔)
 ```
 
 Reglas del repositorio:
@@ -155,6 +158,9 @@ Reglas:
 }
 ```
 
+- El ejemplo de arriba es ilustrativo; las filas de `tasas` traen los campos de `tasas_pf` (sección 4). Las celdas vacías llegan como `null` y las fechas como texto con zona horaria de Lima.
+- `fuente`, `url`, `actualizado`, `estado` y `nota` salen de la fila del recurso en la hoja `fuentes`.
+- `datos.js` agrega dos campos al entregar la respuesta a un módulo: `deCopia` (true si es la última copia guardada en el navegador) y `motivo`. Si no hay red ni copia, lanza un `ErrorDatos` con motivo `sin-configurar`, `sin-conexion`, `sin-respuesta` o `formato`.
 - `estado`: `ok` o `error`. Con `error`, `datos` trae el último valor bueno y la página lo muestra con su fecha.
 - Si la API no responde, la página muestra un mensaje claro y la última copia guardada en el navegador.
 
