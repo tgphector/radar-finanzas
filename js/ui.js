@@ -219,3 +219,44 @@ export function tabla(columnas, filas, descripcion) {
   elemento.append(thead, tbody);
   return elemento;
 }
+
+// Campo para escribir un monto. "prefijo" es el símbolo de la moneda (S/, US$).
+// Llama a alCambiar(numero | null) cada vez que el usuario escribe.
+// Devuelve { elemento, ponerPrefijo(texto), ponerValor(numero | null) }.
+// inputmode="decimal" hace que el celular muestre el teclado de números.
+export function campoMonto(etiquetaTexto, { valor = null, prefijo = "", maximo = 999999999, alCambiar } = {}) {
+  const elemento = crear("label", { clase: "campo" });
+  const caja = crear("span", { clase: "campo__caja" });
+  const marca = crear("span", { clase: "campo__prefijo", texto: prefijo });
+  const entrada = crear("input", {
+    clase: "campo__entrada",
+    atributos: { type: "text", inputmode: "decimal", autocomplete: "off", placeholder: "10 000" }
+  });
+  if (valor !== null) entrada.value = String(valor);
+
+  // Del texto escrito se toma solo el número: "10 000", "10,000" y "10000" valen lo mismo
+  const leer = () => {
+    const limpio = entrada.value.replace(/[\s,]/g, "");
+    if (!/^\d+(\.\d{0,2})?$/.test(limpio)) return null;
+    const numero = Number(limpio);
+    return numero > 0 && numero <= maximo ? numero : null;
+  };
+
+  entrada.addEventListener("input", () => {
+    const numero = leer();
+    // Si hay texto pero no es un monto válido, se marca el campo
+    entrada.setAttribute("aria-invalid", String(entrada.value.trim() !== "" && numero === null));
+    if (alCambiar) alCambiar(numero);
+  });
+
+  caja.append(marca, entrada);
+  elemento.append(crear("span", { clase: "campo__etiqueta", texto: etiquetaTexto }), caja);
+  return {
+    elemento,
+    ponerPrefijo(texto) { marca.textContent = texto; },
+    ponerValor(numero) {
+      entrada.value = numero === null ? "" : String(numero);
+      entrada.setAttribute("aria-invalid", "false");
+    }
+  };
+}

@@ -1,7 +1,8 @@
 // ============================================================
 // plazos.js · Módulo "Depósitos" (dirección #/plazos)
 // Sesión 2 de E2: ranking por TREA de plazo fijo y de CTS,
-// con los datos que publica la SBS. (Sesión 3: simulador.)
+// con los datos que publica la SBS.
+// Sesión 3 de E2: simulador de plazo fijo (interés estimado).
 //
 // Los datos llegan ya pedidos por app.js (contrato de módulo,
 // docs/arquitectura.md, sección 7): datos.tasas, datos.cts y datos.fsd.
@@ -11,7 +12,7 @@
 import { memoria } from "../../js/memoria.js";
 import {
   crear, encabezado, seccion, tarjeta, lineaFuente, aviso, ayuda,
-  pestanas, etiqueta, tabla, fechaDia
+  pestanas, etiqueta, tabla, fechaDia, boton, campoMonto
 } from "../../js/ui.js";
 
 // Productos que muestra el módulo. "recurso" es lo que se pide a la app web.
@@ -42,6 +43,12 @@ const EXPLICA_CTS = "CTS: Compensación por Tiempo de Servicios. Depósito que e
 // 10000 → "10 000" (espacio como separador de miles, sin depender del idioma del navegador)
 function miles(numero) {
   return String(Math.round(numero)).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+}
+
+// 550 → "S/ 550.00" · 1234.5 → "S/ 1 234.50"
+function dinero(numero, simbolo) {
+  const [entero, decimales] = numero.toFixed(2).split(".");
+  return `${simbolo} ${miles(Number(entero))}.${decimales}`;
 }
 
 // 5.5 → "5.50 %"
@@ -88,11 +95,12 @@ function prepararPlazo(respuesta, moneda) {
   const filas = validas
     .filter((fila) => fila.monto === monto)
     .map((fila) => ({ ...fila, valor: fila.trea, maximo: null }));
+  const plazo = filas[0].plazo_dias;
 
   const primera = filas[0];
   const condicion = `Depósitos a plazo por ${moneda.simbolo} ${miles(monto)} a ${primera.plazo_dias} días` +
     (primera.region ? ` · ${primera.region}` : "");
-  return { filas, condicion };
+  return { filas, condicion, monto, plazo };
 }
 
 // --- Prepara las filas de CTS de una moneda ---
@@ -204,14 +212,47 @@ function render(contenedor, datos = {}) {
   );
   const barra = crear("div", { clase: "barra" });
   barra.append(selectores);
+
+  // --- Simulador (solo plazo fijo) ---
+  // El monto es un dato personal: vive solo en este navegador (memoria.js)
+  // y nunca viaja a la hoja ni al repositorio.
+  let monto = memoria.leer("plazos", "monto", null);
+  if (typeof monto !== "number" || !(monto > 0)) monto = null;
+
+  const campo = campoMonto("Monto a depositar", {
+    valor: monto,
+    alCambiar: (numero) => {
+      monto = numero;
+      if (numero === null) memoria.borrar("plazos", "monto");
+      else memoria.guardar("plazos", "monto", numero);
+      pintar();          // Solo se redibuja la tabla: el campo queda intacto mientras se escribe
+    }
+  });
+  const simulador = crear("div", { clase: "simulador" });
+  simulador.append(
+    campo.elemento,
+    boton("Borrar", () => {
+      monto = null;
+      memoria.borrar("plazos", "monto");
+      campo.ponerValor(null);
+      pintar();
+    }),
+    crear("p", { clase: "nota", texto: "Escribe un monto para ver el interés estimado de cada entidad. El monto se guarda solo en este navegador." })
+  );
+
   const zona = crear("div");
-  bloque.append(barra, zona);
+  bloque.append(barra, simulador, zona);
 
   // Dibuja la tabla del producto y la moneda elegidos
   function pintar() {
     const infoProducto = PRODUCTOS.find((opcion) => opcion.id === producto);
     const infoMoneda = MONEDAS.find((opcion) => opcion.id === moneda);
     const respuesta = datos[infoProducto.recurso];
+
+    // El simulador solo aplica a plazo fijo: en CTS se oculta
+    simulador.hidden = producto !== "plazo";
+    campo.ponerPrefijo(infoMoneda.simbolo);
+    const simulando = producto === "plazo" && monto !== null;
 
     // Sin datos y sin copia guardada: mensaje claro y nada más
     if (!respuesta || respuesta.error) {
@@ -261,19 +302,47 @@ function render(contenedor, datos = {}) {
     cabecera.append(crear("p", { clase: "nota", texto: `${preparado.condicion} · ${filas.length} entidades` }));
     piezas.push(cabecera);
 
-    // Tabla: puesto, entidad y TREA. Las entidades con la misma TREA comparten puesto.
+    // Simulación: qué se está calculando y con qué límites
+    if (simulando) {
+      const dias = preparado.plazo || 360;
+      let texto = `Estimado: interés de ${dinero(monto, infoMoneda.simbolo)} en ${dias} días, ` +
+        `calculado con la TREA que la SBS publica para ${infoMoneda.simbolo} ${miles(preparado.monto)}.`;
+      if (monto !== preparado.monto) texto += " Con otro monto la tasa real puede ser distinta.";
+      texto += " Confirma con cada entidad.";
+      piezas.push(crear("p", { clase: "nota", texto }));
+
+      // Aviso informativo si el monto en soles pasa la cobertura del FSD
+      const cobertura = datos.fsd && !datos.fsd.error && datos.fsd.datos && datos.fsd.datos[0];
+      if (moneda === "PEN" && cobertura && typeof cobertura.monto === "number" && monto > cobertura.monto) {
+        piezas.push(crear("p", {
+          clase: "nota",
+          texto: `El monto supera la cobertura del FSD por entidad (S/ ${miles(cobertura.monto)}).`
+        }));
+      }
+    }
+
+    // Tabla: puesto, entidad y TREA (+ interés estimado si se está simulando).
+    // Las entidades con la misma TREA comparten puesto.
     let puesto = 0;
     const cuerpo = filas.map((fila, i) => {
       if (i === 0 || fila.valor !== filas[i - 1].valor) puesto = i + 1;
-      return [String(puesto), celdaEntidad(fila), celdaTrea(fila, mayor, producto === "cts")];
+      const celdas = [String(puesto), celdaEntidad(fila), celdaTrea(fila, mayor, producto === "cts")];
+      if (simulando) {
+        // Interés en un año de 360 días: monto × TREA
+        celdas.push(crear("span", { clase: "tabla__dinero", texto: dinero(monto * fila.valor / 100, infoMoneda.simbolo) }));
+      }
+      return celdas;
     });
-    const caja = tarjeta("tarjeta--lista");
+    const columnas = [
+      { titulo: "#", clase: "tabla__puesto" },
+      { titulo: "Entidad" },
+      { titulo: producto === "cts" ? "TREA mínima – máxima" : "TREA", clase: "tabla__num" }
+    ];
+    if (simulando) columnas.push({ titulo: "Interés estimado", clase: "tabla__num" });
+    // Con la columna nueva la tarjeta avisa a los estilos que en celular debe ocultar la barra
+    const caja = tarjeta(simulando ? "tarjeta--lista tarjeta--lista-ancha" : "tarjeta--lista");
     caja.append(tabla(
-      [
-        { titulo: "#", clase: "tabla__puesto" },
-        { titulo: "Entidad" },
-        { titulo: producto === "cts" ? "TREA mínima – máxima" : "TREA", clase: "tabla__num" }
-      ],
+      columnas,
       cuerpo,
       `Ranking por TREA de ${infoProducto.nombre} en ${infoMoneda.nombre.toLowerCase()}`
     ));

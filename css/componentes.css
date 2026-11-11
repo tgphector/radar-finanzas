@@ -540,3 +540,88 @@
   .barra-valor--rango .barra-valor__riel { display: none; }
   .barra-valor__cifra--rango { min-width: 0; }
 }
+
+/* ============================================================
+   Piezas agregadas en la S3 de E2: campo de monto y simulador.
+   ============================================================ */
+
+/* --- Campo para escribir un monto --- */
+.campo {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.campo__etiqueta {
+  color: var(--texto-2);
+  font-size: var(--t-chico);
+}
+
+.campo__caja {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--e1);
+  min-height: var(--toque);
+  padding: 0 12px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: var(--fondo);
+}
+
+/* El borde se ilumina cuando se está escribiendo */
+.campo__caja:focus-within { border-color: var(--acento); }
+
+.campo__prefijo { color: var(--texto-2); }
+
+.campo__entrada {
+  width: 140px;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--texto);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Monto que no se entiende: borde punteado (no rojo: ese color es solo para bajadas) */
+.campo__caja:has(.campo__entrada[aria-invalid="true"]) {
+  border-style: dashed;
+  border-color: var(--texto-2);
+}
+
+/* --- Simulador: campo, botón y explicación en una fila --- */
+.simulador {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--e2);
+  max-width: 780px;
+  margin: 0 auto var(--e2);
+}
+
+/* "hidden" debe ganar al display: flex de arriba */
+.simulador[hidden] { display: none; }
+
+.simulador .nota {
+  flex: 1 1 260px;
+  margin-top: 0;
+}
+
+/* Cifra de dinero dentro de una tabla */
+.tabla__dinero { font-weight: 600; }
+
+/* Con la columna de interés estimado, en celular no queda sitio para la barra */
+@media (max-width: 599px) {
+  .tarjeta--lista-ancha .barra-valor__riel { display: none; }
+  .tarjeta--lista-ancha .barra-valor__cifra { min-width: 0; }
+  /* Cuatro columnas no entran en 360 px: se oculta el puesto (el orden ya lo da la lista)
+     y se aprietan los márgenes */
+  .tarjeta--lista-ancha .tabla__puesto { display: none; }
+  .tarjeta--lista-ancha .tabla { font-size: 0.875rem; }
+  .tarjeta--lista-ancha .tabla th,
+  .tarjeta--lista-ancha .tabla td { padding-left: 8px; padding-right: 8px; }
+  .tarjeta--lista-ancha .tabla th:nth-child(2),
+  .tarjeta--lista-ancha .tabla td:nth-child(2) { padding-left: 12px; }
+  .tarjeta--lista-ancha .tabla th:last-child,
+  .tarjeta--lista-ancha .tabla td:last-child { padding-right: 12px; }
+}
