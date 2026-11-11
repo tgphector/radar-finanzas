@@ -4,6 +4,15 @@ Una línea por decisión. Lo más nuevo arriba.
 
 | Fecha | Decisión | Motivo |
 |---|---|---|
+| 11 nov 2026 | **E1 terminado.** Cumple la definición de terminado completa; Héctor confirmó que lo usó al menos 3 veces | Cierre del entregable |
+| 11 nov 2026 | Gráfico grande: widget "Advanced Chart" de TradingView (`embed-widget-advanced-chart.js`), tema oscuro, gráfico de área, abre en 1 año. Trae sus propios periodos (1D, 5D, 1M, 1A, 5A y además 3M, 6M, YTD y Todos, que no se pueden quitar) | Es el único widget probado que reúne selector de periodos, tema oscuro y buscador. Pesa más (~5 MB) pero solo se carga al pulsar un símbolo. Alternativa descartada: "Symbol Overview" (más liviano y con línea cian, pero sin buscador) |
+| 11 nov 2026 | Buscador de símbolos activado con la lupa del gráfico grande (`allow_symbol_change`). El título de Radar muestra el símbolo con el que se abrió el gráfico y una nota explica la lupa | Radar no puede leer qué se busca dentro del widget. Que el título siga a la búsqueda queda como mejora menor en el backlog |
+| 11 nov 2026 | El gráfico grande se abre debajo de los chips en laptop y en un panel a pantalla completa con "Cerrar" en celular (bajo 900 px). Reemplaza al gráfico simple de la S2 | Decisión de Héctor |
+| 11 nov 2026 | Los favoritos abren el gráfico grande con un botón "Ampliar" (⤢) en la esquina de cada tarjeta | El clic sobre el mini gráfico lo recibe TradingView. Una capa transparente sobre toda la tarjeta taparía el detalle y la marca de TradingView |
+| 11 nov 2026 | Tabla de cotizaciones limitada a 780 px y centrada | El widget no deja controlar sus columnas y a más ancho deja un hueco entre "Nombre" y "Valor"; a 780 px entran las ocho columnas justas |
+| 11 nov 2026 | Subtítulo de Mis gráficas: "Sigue tus favoritos, revisa precios por pestaña y abre el gráfico de cualquier símbolo." La ayuda "?" de ETF pasa a la nota de la pestaña ETFs | Héctor pidió una línea que diga qué se puede hacer, en lugar de una pregunta |
+| 11 nov 2026 | Se recorta de E1 la edición de favoritos desde la interfaz; pasa a "Ideas sin compromiso" | No cabía en la S3 junto con el feedback de uso |
+| 11 nov 2026 | Componentes nuevos compartidos: botón de ícono y panel (`ui.js` y `componentes.css`) | Regla de arquitectura: lo nuevo y compartido se anota |
 | 11 nov 2026 | Buscador de símbolos: si el widget del gráfico grande de la S3 trae buscador propio, se activa dentro de la S3. No se construye un buscador propio en E1. "Agregar el símbolo buscado a mi lista" queda en el backlog como funcionalidad aparte, sin entregable asignado | Idea de Héctor. Activar una opción del widget no cambia el plan; guardar símbolos propios sí (campo propio, memoria y validación) |
 | 11 nov 2026 | Entregable nuevo y tentativo "Fundamentales" después de E3: tabla propia con P/E, P/E forward y otras métricas, con datos traídos por Apps Script desde una API y guardados en Sheets. Los ETFs llevan sus propias métricas porque normalmente no tienen P/E. La API no está elegida | Idea de Héctor. El widget de cotizaciones no permite columnas propias. El plan de E1 a E3 no cambia |
 | 11 nov 2026 | Los favoritos son independientes del botón "Editar": apagar un símbolo lo quita de la tabla y de los chips, pero su tarjeta de favorito sigue visible | Sería raro que un favorito desaparezca por un interruptor de la tabla. Ajusta la regla "un widget solo se crea si el símbolo está activo": aplica a la tabla, no a los favoritos |
@@ -59,6 +68,5 @@ Una línea por decisión. Lo más nuevo arriba.
 ## Pendientes
 - Elegir la API de "Fundamentales" y confirmar sus límites y términos (lista de candidatas en `docs/backlog.md`); verla junto con la API de precios de E4.
 - Fijar en la revisión posterior a E3 el número de "Fundamentales" y su orden frente a E4 (Mis reglas).
-- En la S3: comprobar si el widget elegido para el gráfico grande trae buscador de símbolos.
 - Símbolos "sin datos en TradingView" por decidir: ninguno (11 nov 2026).
 - Confirmar si la SBS permite leer las tasas con un script (E2/E3).

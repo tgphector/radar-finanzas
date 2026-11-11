@@ -49,37 +49,36 @@ Eres mi socio de desarrollo para construir Radar, una web personal de herramient
 Directo, breve, en español. Si mi idea complica el proyecto o choca con una decisión anterior, dímelo claro.
 
 ## Estado actual
-Actualizado: 11 nov 2026, cierre de la S2 de E1 y registro de dos ideas nuevas (buscador de símbolos y "Fundamentales").
+Actualizado: 11 nov 2026, cierre de E1.
 
-**En curso:** E1 · Esqueleto + Mis gráficas. Sesiones 1 y 2 de 3 hechas.
+**En curso:** E2 · Plazos fijos. Ninguna sesión hecha todavía (sigue la S1 de 3).
 
-**Hecho**
-- Repositorio y GitHub Pages activos. El repositorio se recreó el 11 nov 2026 con un historial limpio.
+**Terminado: E1 · Esqueleto + Mis gráficas** (11 nov 2026, definición de terminado completa, revisado en la página publicada)
 - Esqueleto: menú lateral (laptop) y barra inferior (celular), router (`#/graficas`, `#/plazos`), design system, pie con aviso, `memoria.js`, `ui.js`.
-- Mis gráficas · Favoritos: 6 tarjetas con mini gráfico de TradingView (último año), carga diferida, línea de fuente y hora, ayuda "?" en ETF.
-- Mis gráficas · Todos los símbolos: pestañas (Populares, ETFs, Otros, Referencias), tabla de cotizaciones por pestaña con los símbolos activos, chips que abren un gráfico simple de 1 año y botón "Editar" con un interruptor por símbolo, guardado en el navegador.
-- Los 45 símbolos de `simbolos.json` probados en TradingView: todos cargan (QBTS corregido a `NASDAQ:QBTS`). Ninguno quedó "sin datos".
-- Componentes compartidos nuevos en `ui.js` y `componentes.css`: botón, pestañas, chip, interruptor.
+- Favoritos: 6 tarjetas con mini gráfico de TradingView y botón "Ampliar".
+- Todos los símbolos: pestañas, tabla de cotizaciones por pestaña (centrada, 780 px), chips, botón "Editar" con interruptores guardados en el navegador.
+- Gráfico grande: widget avanzado de TradingView con periodos y lupa para buscar cualquier símbolo; en celular, panel a pantalla completa.
+- Los 45 símbolos de `simbolos.json` cargan en TradingView.
 - Plazos fijos aparece en el menú como "Próximamente".
-- Revisado en la página publicada (laptop y celular). Fallas probadas: sin conexión, localStorage bloqueado, pestaña con todo apagado, símbolo marcado "sin datos".
 
-**Próxima sesión (S3 de E1, la última del entregable)**
-1. Gráfico grande con selector 1d / 5d / 1m / 1a / 5a. Reemplaza al gráfico simple que hoy abre el chip (`pintarGrafico()` en `graficas.js`).
-2. Pruebas finales de E1 contra la definición de terminado (sección 14 de `docs/arquitectura.md`): laptop, celular, sin conexión, localStorage bloqueado.
-3. Buscador de símbolos: si el widget elegido para el gráfico grande trae buscador propio, activarlo (detalle en `docs/backlog.md`). No construir uno propio.
-4. Si sobra tiempo (recortable): editar favoritos desde la interfaz.
+**Próxima sesión (S1 de E2)**
+1. Revisar qué tablas de tasas de depósitos a plazo publica la SBS (plazos, montos, monedas, tipos de entidad) y proponer a Héctor las columnas de `tasas_pf`. Punto de partida: sección 4 de `docs/arquitectura.md`.
+2. Preparar el archivo "Radar · Base de datos" en Google Sheets con las hojas `tasas_pf`, `fsd`, `fuentes` y `log`, y llenar `tasas_pf` a mano con datos de la SBS.
+3. `Api.gs` con `doGet` (`?recurso=tasas|fsd`), publicado como app web, con `CacheService`. Explicar lo nuevo: app web, `doGet`, `CacheService`.
+4. `js/config.js` y `js/datos.js`; comprobar primero que la página publicada logra leer la app web (es el mayor riesgo; plan B: JSON en el repositorio).
+5. Si queda tiempo: primera versión del ranking por TREA a 1 año en `modulos/plazos/plazos.js`.
 
-**Decisiones que debo preguntarle a Héctor al iniciar la S3**
-1. Qué widget usar para el gráfico grande: uno liviano con periodos propios o el gráfico avanzado de TradingView. Llevar 2-3 opciones probadas, con su peso, cómo se ven en celular y si traen buscador de símbolos.
-2. Dónde se abre el gráfico grande: debajo de los chips (como hoy) o en un panel que tape la pantalla en celular.
-3. Si los favoritos también abren el gráfico grande al pulsarlos.
+**Decisiones que debo preguntarle a Héctor al iniciar E2**
+1. Columnas de `tasas_pf` según lo que publique la SBS (2-3 opciones).
+2. Cómo se reparte E2 en sus 3 sesiones (propuesta: S1 datos y API; S2 ranking y FSD; S3 simulador y pruebas).
+3. Quién crea el archivo de Sheets y pega `Api.gs`: Héctor a mano, o Claude con el conector de Google Sheets si está disponible en la sesión. La publicación de la app web la hace siempre Héctor.
 
 **Notas técnicas para retomar**
-- Antes de escribir el gráfico grande, confirma en la documentación de widgets de TradingView el nombre del script y sus opciones (en especial cómo se fija el periodo); no lo des por sabido.
-- `cargarWidget()` en `graficas.js` sirve para cualquier widget en formato iframe: recibe el script y la configuración.
-- Los iframes de TradingView no se pueden leer desde el código de la página. El widget de cotizaciones omite sin avisar un símbolo inválido: si uno deja de cargar, se marca `"sinDatos": true` en `simbolos.json` y se anota en Pendientes de `docs/decisiones.md`.
-- Memoria del módulo: `radar.graficas.apagados`, `radar.graficas.pestana`, `radar.graficas.favoritos`.
-- Entorno en la nube de Claude Code: el entorno "radar-finanzas" permite llegar a TradingView y a la página publicada, así que los widgets se pueden probar con un navegador sin interfaz. Las capturas de página completa muestran vacíos los gráficos fuera de pantalla; hay que capturar la zona visible.
+- `cargarWidget()` en `graficas.js` sirve para cualquier widget de TradingView en formato iframe.
+- Los iframes de TradingView no se pueden leer desde la página. Si un símbolo deja de cargar, se marca `"sinDatos": true` en `simbolos.json` y se anota en Pendientes de `docs/decisiones.md`.
+- TradingView cambia el aspecto y los servidores de sus widgets sin aviso. Si un widget sale vacío en las pruebas, revisar primero si el entorno bloquea un sitio nuevo de TradingView.
+- Entorno en la nube de Claude Code: el entorno "radar-finanzas" permite llegar a TradingView y a la página publicada. Para E2 hará falta pedir permiso para el sitio de la SBS y para la app web de Apps Script. Las capturas de página completa muestran vacíos los gráficos fuera de pantalla; hay que capturar la zona visible.
+- La URL de la app web va en `js/config.js` y es pública: la app solo entrega datos públicos y nunca escribe.
 - Commits con identidad genérica (`Claude <noreply@anthropic.com>`). Se trabaja en una rama y se pasa a `main` al cerrar la sesión.
 
-**Pendientes abiertos:** ver también la sección "Pendientes" de `docs/decisiones.md`.
+**Pendientes abiertos:** sección "Pendientes" de `docs/decisiones.md` y "Mejoras menores pendientes" de `docs/backlog.md`.

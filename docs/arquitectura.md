@@ -1,4 +1,6 @@
-# Arquitectura de Radar (v5, 11 nov 2026 · cierre de la S2 de E1)
+# Arquitectura de Radar (v6, 11 nov 2026 · cierre de E1)
+
+Cambios de v6: gráfico grande con el widget avanzado de TradingView (periodos y buscador), panel a pantalla completa en celular, botón "Ampliar" en favoritos, tabla limitada a 780 px.
 
 Cambios de v5: tabla por pestañas, chips y "Editar" construidos; los 45 símbolos verificados; marca `sinDatos`; claves de memoria de Mis gráficas; componentes nuevos.
 
@@ -88,7 +90,7 @@ radar-finanzas/
 ├── css/
 │   ├── tokens.css             # Design system                                           (E1 ✔)
 │   ├── base.css               # Estilos generales y responsive                          (E1 ✔)
-│   └── componentes.css        # Tarjeta, cuadrícula, fuente, aviso, ayuda "?"           (E1 ✔; botón, pestañas, chip e interruptor desde S2)
+│   └── componentes.css        # Tarjeta, cuadrícula, fuente, aviso, ayuda "?"           (E1 ✔; botón, pestañas, chip e interruptor desde S2; botón de ícono y panel desde S3)
 ├── js/
 │   ├── app.js                 # Arranque, router (#/graficas, #/plazos), registro       (E1 ✔)
 │   ├── memoria.js             # Capa de almacenamiento personal (sección 9)             (E1 ✔)
@@ -97,7 +99,7 @@ radar-finanzas/
 │   └── datos.js               # Pide el JSON, maneja errores y muestra la fecha         (E2)
 ├── modulos/
 │   ├── graficas/
-│   │   ├── graficas.js        #                                                         (E1, S1 y S2 ✔)
+│   │   ├── graficas.js        #                                                         (E1 ✔)
 │   │   └── simbolos.json      # Símbolos por pestaña y favoritos por defecto            (E1 ✔)
 │   └── plazos/
 │       └── plazos.js          #                                                         (E2)
@@ -200,25 +202,28 @@ Reglas:
 - Un símbolo que deje de cargar se marca con `"sinDatos": true` en `simbolos.json`: sale de la tabla y se ve como chip gris "Sin datos en TradingView". El widget omite un símbolo inválido sin avisar, por eso la marca es manual; se anota en Pendientes de `docs/decisiones.md`.
 
 ### Vista
-- **Favoritos (hecho en S1):** 6 tarjetas con mini gráfico arriba (widget "Mini Chart", último año, línea en cian).
-- **Todos los símbolos (hecho en S2):** pestañas (Populares, ETFs, Otros, Referencias) y un widget de cotizaciones por pestaña, solo con los símbolos activos. Columnas del widget: valor, cambio, cambio %, apertura, máximo, mínimo y anterior. Se recuerda la última pestaña abierta. En celular la tabla se desliza de lado dentro de su tarjeta.
-- **Chips de símbolos (hecho en S2)** debajo de la tabla (elementos propios): clic en un chip abre debajo un gráfico simple de 1 año con botón "Cerrar". Motivo: el clic dentro de un widget lleva a tradingview.com y la página no lo puede capturar.
+- **Favoritos (hecho en S1):** 6 tarjetas con mini gráfico arriba (widget "Mini Chart", último año, línea en cian). Cada tarjeta lleva un botón "Ampliar" (⤢) que abre el gráfico grande (S3).
+- **Todos los símbolos (hecho en S2):** pestañas (Populares, ETFs, Otros, Referencias) y un widget de cotizaciones por pestaña, solo con los símbolos activos. Columnas del widget: valor, cambio, cambio %, apertura, máximo, mínimo y anterior. Se recuerda la última pestaña abierta. La tarjeta de la tabla mide como máximo 780 px y va centrada (a más ancho el widget deja un hueco entre "Nombre" y "Valor"). En celular la tabla se desliza de lado dentro de su tarjeta.
+- **Chips de símbolos (hecho en S2)** debajo de la tabla (elementos propios): clic en un chip abre el gráfico grande. Motivo: el clic dentro de un widget lleva a tradingview.com y la página no lo puede capturar.
 - **Editar (hecho en S2):** dentro de cada pestaña, los chips se vuelven interruptores y el botón pasa a "Listo"; al pulsarlo, la tabla se rehace con los activos. Los favoritos no dependen de estos interruptores.
 - **Memoria del módulo:** `radar.graficas.apagados` (lista de símbolos apagados; los demás están activos), `radar.graficas.pestana` (última pestaña) y `radar.graficas.favoritos` (aún sin interfaz).
-- **Gráfico grande (S3)** con selector 1d / 5d / 1m / 1a / 5a; reemplaza al gráfico simple que abre el chip.
+- **Gráfico grande (hecho en S3):** widget avanzado de TradingView dentro de un panel con título, botón "Cerrar" (también la tecla Escape) y línea de fuente. Trae sus propios periodos (1D, 5D, 1M, 1A, 5A, además de 3M, 6M, YTD y Todos) y una lupa para buscar cualquier símbolo. Abre en 1 año. En laptop el panel va debajo de los chips; bajo 900 px ocupa toda la pantalla y los periodos quedan en el menú "Rango de fechas" del widget.
+- **Límite del buscador:** Radar no puede leer qué símbolo se buscó dentro del widget; el título del panel muestra el símbolo con el que se abrió.
 - Cada bloque muestra "Fuente: TradingView · cargado <fecha y hora>"; los precios pueden tener retraso según la bolsa.
 
 ### Widgets de TradingView
 - **Formato:** iframe. Se crea un `div.tradingview-widget-container` con un `<script>` cuyo `src` es el del widget y cuyo contenido es la configuración en JSON.
 - Mini Chart: `https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js` con `colorTheme: "dark"`, `isTransparent: true`, `locale: "es"`, `dateRange: "12M"`.
 - Tabla (Market Quotes): `https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js` con `symbolsGroups` (un grupo por pestaña; cada símbolo con `name` y `displayName`), `colorTheme: "dark"`, `isTransparent: true`, `locale: "es"`. El alto de la tarjeta se calcula por filas: 54 px de encabezado + 36 px por símbolo + 40 px para la marca.
-- `cargarWidget()` en `graficas.js` crea cualquiera de los dos widgets; solo cambian el script y la configuración.
+- Gráfico grande (Advanced Chart): `https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js` con `autosize: true`, `range: "12M"`, `interval: "D"`, `theme: "dark"`, `style: "3"` (área), `withdateranges: true`, `allow_symbol_change: true`, `hide_side_toolbar: true`, `locale: "es"`. La caja interna `tradingview-widget-container__widget` necesita alto del 100 % o el gráfico sale aplastado.
+- `cargarWidget()` en `graficas.js` crea cualquiera de los tres widgets; solo cambian el script y la configuración.
+- TradingView cambia el aspecto de sus widgets sin aviso: desde el 11 nov 2026 el mini gráfico muestra solo el símbolo (sin el nombre de la empresa) y se sirve desde `widgets.tradingview-widget.com`.
 - El texto "Cargando…" se quita cuando el iframe termina de cargar (MutationObserver + evento `load`).
 - Fallas cubiertas: sin conexión (reintenta al volver el internet), script bloqueado (mensaje en la tarjeta), `simbolos.json` no disponible (aviso en el módulo).
 
 ### Rendimiento
 - Ningún widget se carga al abrir la página.
-- Un widget se crea solo cuando está por aparecer en pantalla (IntersectionObserver, con 200 px de anticipación). La tabla incluye solo los símbolos **activos** y solo se crea la de la pestaña abierta. El gráfico de un chip se crea al pulsarlo.
+- Un widget se crea solo cuando está por aparecer en pantalla (IntersectionObserver, con 200 px de anticipación). La tabla incluye solo los símbolos **activos** y solo se crea la de la pestaña abierta. El gráfico grande se crea al pulsar un chip o el botón "Ampliar".
 - Un widget por pestaña para la tabla, no uno por símbolo.
 - Meta: primera pantalla en menos de 2 segundos. La marca TradingView queda visible.
 
