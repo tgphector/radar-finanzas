@@ -17,6 +17,7 @@
 // Qué hoja corresponde a cada recurso que puede pedir la página
 const RECURSOS = {
   tasas: "tasas_pf",
+  cts: "tasas_cts",
   fsd: "fsd"
 };
 

@@ -509,9 +509,34 @@
   min-width: 64px;
   font-weight: 600;
   text-align: right;
+  white-space: nowrap;
 }
+
+/* Grupo de selectores uno al lado del otro (producto y moneda).
+   Cada selector va en su propio marco para que se lea como una
+   elección distinta y no como una sola fila de pestañas. */
+.barra__grupo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e1) var(--e2);
+}
+
+.barra__grupo .pestanas {
+  padding: 4px;
+  border: 1px solid var(--borde);
+  border-radius: calc(var(--radio) + 4px);
+}
+
+/* Cifra con rango ("5.50 % – 6.00 %"): ancho fijo para que todas
+   las barras de la tabla midan lo mismo y se puedan comparar */
+.barra-valor__cifra--rango { min-width: 150px; }
 
 @media (max-width: 599px) {
   .tabla th, .tabla td { padding-left: 12px; padding-right: 12px; }
   .tabla .tabla__puesto { width: 36px; }
+  .tabla th.tabla__num { white-space: normal; }
+  /* En celular el rango no deja sitio para la barra: se muestra solo la cifra */
+  .barra-valor--rango .barra-valor__riel { display: none; }
+  .barra-valor__cifra--rango { min-width: 0; }
 }
