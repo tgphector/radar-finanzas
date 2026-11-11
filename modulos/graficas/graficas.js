@@ -2,7 +2,7 @@
 // graficas.js · Módulo "Mis gráficas"
 // Sesión 1: tarjetas de favoritos con mini gráfico.
 // Sesión 2: tabla por pestañas, chips y botón "Editar".
-// (Sesión 3: gráfico grande con selector de periodo.)
+// Sesión 3: gráfico grande con periodos y buscador de símbolos.
 //
 // Los gráficos y la tabla son widgets de TradingView: Radar no
 // recibe los precios, solo le dice al widget qué símbolos mostrar.
@@ -11,7 +11,7 @@
 import { memoria } from "../../js/memoria.js";
 import {
   crear, encabezado, seccion, tarjeta, lineaFuente, aviso, ayuda,
-  boton, pestanas, chip, interruptor
+  boton, botonIcono, pestanas, chip, interruptor
 } from "../../js/ui.js";
 
 // Dirección de simbolos.json, calculada desde la ubicación de este archivo
@@ -20,6 +20,7 @@ const URL_SIMBOLOS = new URL("./simbolos.json", import.meta.url);
 // Scripts oficiales de los widgets de TradingView (formato iframe)
 const SCRIPT_MINI = "https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js";
 const SCRIPT_TABLA = "https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js";
+const SCRIPT_GRANDE = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
 
 // Alto de la tabla de cotizaciones: encabezado + una fila por símbolo
 // + la franja con la marca de TradingView (medidas del widget, en px).
@@ -151,6 +152,35 @@ function cargarMini(caja, item) {
   });
 }
 
+// --- Gráfico grande de un símbolo (widget "Advanced Chart") ---
+// Trae sus propios botones de periodo (1D, 5D, 1M, 1A, 5A y otros) y una
+// lupa para buscar cualquier símbolo, aunque no esté en simbolos.json.
+function cargarGrande(caja, item) {
+  cargarWidget(caja, {
+    script: SCRIPT_GRANDE,
+    rotulo: { titulo: item.simbolo, detalle: item.nombre },
+    que: "el gráfico",
+    config: {
+      symbol: item.tv,
+      autosize: true,                // Ocupa toda la tarjeta
+      range: "12M",                  // Abre en 1 año, igual que los mini gráficos
+      interval: "D",                 // Una vela o punto por día
+      timezone: "America/Lima",
+      theme: "dark",
+      style: "3",                    // Gráfico de área (línea con relleno)
+      locale: "es",
+      withdateranges: true,          // Botones de periodo debajo del gráfico
+      allow_symbol_change: true,     // Activa la lupa para buscar otro símbolo
+      hide_side_toolbar: true,       // Sin herramientas de dibujo
+      save_image: false,
+      calendar: false,
+      details: false,
+      backgroundColor: "rgba(23, 25, 28, 1)",   // Color de las tarjetas de Radar
+      gridColor: "rgba(38, 41, 46, 0.6)"
+    }
+  });
+}
+
 // --- Tabla de cotizaciones de una pestaña (widget "Market Quotes") ---
 // Un solo widget con todos los símbolos activos de la pestaña.
 // Columnas del widget: valor, cambio, cambio %, apertura, máximo, mínimo y anterior.
@@ -206,7 +236,8 @@ function alVerse(elemento, accion) {
 }
 
 // --- Sección "Favoritos": tarjetas con mini gráfico ---
-function dibujarFavoritos(contenedor, lista) {
+// "abrir(item)" abre el gráfico grande de un símbolo.
+function dibujarFavoritos(contenedor, lista, abrir) {
   const bloque = seccion("Favoritos");
   const cuadricula = crear("div", { clase: "cuadricula" });
 
@@ -214,6 +245,9 @@ function dibujarFavoritos(contenedor, lista) {
     const caja = tarjeta("tarjeta--grafico");
     caja.setAttribute("aria-label", `Gráfico de ${item.simbolo}, ${item.nombre}`);
     ponerEspera(caja, { titulo: item.simbolo, detalle: item.nombre }, "");
+    // Botón "Ampliar": el clic sobre el mini gráfico lo recibe TradingView
+    // (es un iframe de otro sitio), así que Radar necesita un botón propio.
+    caja.append(botonIcono("⤢", `Ampliar el gráfico de ${item.simbolo}`, () => abrir(item)));
     cuadricula.append(caja);
     alVerse(caja, () => cargarMini(caja, item));
   }
@@ -231,6 +265,8 @@ function dibujarFavoritos(contenedor, lista) {
 }
 
 // --- Sección "Todos los símbolos": pestañas, tabla, chips y Editar ---
+// Devuelve la función que abre el gráfico grande, para que también
+// la usen las tarjetas de favoritos.
 function dibujarSeguimiento(contenedor, lista) {
   // Lo que el usuario eligió, leído del navegador:
   // - apagados: símbolos que desactivó (los nuevos nacen activos)
@@ -342,9 +378,13 @@ function dibujarSeguimiento(contenedor, lista) {
         elegido: estado.elegido === item.simbolo,
         alPulsar: () => {
           // Pulsar el chip elegido cierra su gráfico; pulsar otro lo cambia
-          estado.elegido = estado.elegido === item.simbolo ? null : item.simbolo;
-          pintarChips();
-          pintarGrafico();
+          if (estado.elegido === item.simbolo) {
+            estado.elegido = null;
+            pintarChips();
+            pintarGrafico();
+          } else {
+            abrir(item);
+          }
         }
       }));
     }
@@ -354,60 +394,81 @@ function dibujarSeguimiento(contenedor, lista) {
       if (!estado.sinMemoria) notas.push("Se guarda solo en este navegador.");
     } else {
       const ocultos = pestana.simbolos.filter((item) => !item.sinDatos && estado.apagados.has(item.simbolo)).length;
-      if (activosDe(pestana).length) notas.push("Pulsa un símbolo para ver su gráfico.");
+      if (activosDe(pestana).length) notas.push("Pulsa un símbolo para abrir su gráfico.");
       if (ocultos) notas.push(`${ocultos} ${ocultos === 1 ? "símbolo apagado" : "símbolos apagados"}: pulsa Editar para verlos.`);
     }
     if (estado.sinMemoria) {
       notas.push("Tu navegador no deja guardar: los cambios duran hasta que cierres o recargues la página.");
     }
 
-    zonaChips.replaceChildren(fila, crear("p", { clase: "nota", texto: notas.join(" ") }));
+    const nota = crear("p", { clase: "nota", texto: notas.join(" ") });
+    // Ayuda "justo a tiempo": en la pestaña de ETFs se explica qué es un ETF
+    if (pestana.id === "etfs") {
+      nota.append(" ¿Qué es un ETF?", ayuda("un ETF", "ETF: fondo que cotiza en bolsa como una acción y agrupa muchos activos."));
+    }
+    zonaChips.replaceChildren(fila, nota);
   }
 
-  // Gráfico del símbolo elegido (simple, 1 año). En la S3 lo reemplaza
-  // el gráfico grande con selector de periodo.
+  // Gráfico grande del símbolo elegido.
+  // En laptop se abre debajo de los chips; en celular el mismo panel
+  // ocupa toda la pantalla (lo decide componentes.css, clase "panel").
   function pintarGrafico() {
     const item = estado.elegido ? buscarSimbolo(lista, estado.elegido) : null;
     if (!item) { zonaGrafico.replaceChildren(); return; }
 
-    const cabecera = crear("div", { clase: "panel__cabecera" });
-    const titulo = crear("h3", { clase: "panel__titulo", texto: `${item.simbolo} ` });
-    titulo.append(crear("span", { texto: `· ${item.nombre}` }));
-    cabecera.append(titulo, boton("Cerrar", () => {
+    const cerrar = () => {
       estado.elegido = null;
       pintarChips();
       pintarGrafico();
-    }));
+    };
 
-    const caja = tarjeta("tarjeta--grafico tarjeta--grafico-panel");
+    const cabecera = crear("div", { clase: "panel__cabecera" });
+    const titulo = crear("h3", { clase: "panel__titulo", texto: `${item.simbolo} ` });
+    titulo.append(crear("span", { texto: `· ${item.nombre}` }));
+    cabecera.append(titulo, boton("Cerrar", cerrar));
+
+    const caja = tarjeta("tarjeta--grafico tarjeta--grafico-grande");
     caja.setAttribute("aria-label", `Gráfico de ${item.simbolo}, ${item.nombre}`);
 
-    zonaGrafico.replaceChildren(
-      cabecera,
-      caja,
-      lineaFuente({
-        fuente: "TradingView",
-        fecha: new Date(),
-        verbo: "cargado",
-        nota: "último año · los precios pueden tener retraso"
-      })
-    );
-    cargarMini(caja, item);   // Se abre por un clic del usuario: se carga de inmediato
+    const pie = lineaFuente({
+      fuente: "TradingView",
+      fecha: new Date(),
+      verbo: "cargado",
+      nota: "los precios pueden tener retraso"
+    });
+    // Radar no puede saber qué se busca dentro del gráfico: se avisa cómo usar la lupa
+    pie.append(crear("span", { texto: " · Con la lupa del gráfico puedes ver cualquier otro símbolo." }));
+
+    const panel = crear("div", { clase: "panel", atributos: { role: "region", "aria-label": `Gráfico grande de ${item.simbolo}` } });
+    // La tecla Escape también cierra (útil en el panel a pantalla completa)
+    panel.addEventListener("keydown", (evento) => { if (evento.key === "Escape") cerrar(); });
+    panel.append(cabecera, caja, pie);
+    zonaGrafico.replaceChildren(panel);
+
+    cargarGrande(caja, item);   // Se abre por un clic del usuario: se carga de inmediato
+    // En laptop la página baja sola hasta el gráfico (viene bien al abrirlo desde un favorito)
+    panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  // Abre el gráfico grande de un símbolo (lo usan los chips y los favoritos)
+  function abrir(item) {
+    estado.elegido = item.simbolo;
+    pintarChips();
+    pintarGrafico();
   }
 
   pintarTabla();
   pintarChips();
+  return abrir;
 }
 
 // --- Dibuja el módulo dentro de su contenedor ---
 async function render(contenedor) {
-  // Título + pregunta que responde el módulo, con ayuda "?" en ETF
-  const pregunta = crear("span", { texto: "¿Cómo van las acciones y ETFs" });
-  pregunta.append(
-    ayuda("un ETF", "ETF: fondo que cotiza en bolsa como una acción y agrupa muchos activos."),
-    " que sigo?"
-  );
-  contenedor.append(encabezado("Mis gráficas", pregunta));
+  // Título + una línea que dice qué se puede hacer en este apartado
+  contenedor.append(encabezado(
+    "Mis gráficas",
+    "Sigue tus favoritos, revisa precios por pestaña y abre el gráfico de cualquier símbolo."
+  ));
 
   // Lista de símbolos. Si falla, mensaje claro y se termina aquí.
   let lista;
@@ -422,8 +483,11 @@ async function render(contenedor) {
   }
 
   reiniciarVigilante();
-  dibujarFavoritos(contenedor, lista);
-  dibujarSeguimiento(contenedor, lista);
+  // Los favoritos van primero en la página, pero el gráfico grande vive en la
+  // sección de abajo: "enlace" guarda la función para abrirlo cuando ya exista.
+  const enlace = { abrir: () => {} };
+  dibujarFavoritos(contenedor, lista, (item) => enlace.abrir(item));
+  enlace.abrir = dibujarSeguimiento(contenedor, lista);
 }
 
 // --- Contrato del módulo (docs/arquitectura.md, sección 7) ---

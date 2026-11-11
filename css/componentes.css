@@ -212,12 +212,16 @@
    conserva un ancho mínimo para que las columnas no se aplasten. */
 .tarjeta--tabla {
   position: relative;
+  /* A más ancho, el widget deja un hueco entre "Nombre" y "Valor":
+     con 780 px entran las ocho columnas justas. Centrada en la sección. */
+  max-width: 780px;
+  margin: 0 auto;
   padding: 0;
   overflow-x: auto;
   overflow-y: hidden;
 }
 
-.tarjeta--tabla .tradingview-widget-container { min-width: 680px; }
+.tarjeta--tabla .tradingview-widget-container { min-width: 760px; }
 
 /* --- Chips: fila de etiquetas que se pueden pulsar --- */
 .chips {
@@ -321,5 +325,70 @@
 .panel__titulo { font-size: var(--t-base); font-weight: 600; }
 .panel__titulo span { color: var(--texto-2); font-weight: 400; }
 
-/* Gráfico del símbolo elegido: más alto que el de una tarjeta */
-.tarjeta--grafico-panel { height: 320px; }
+/* ============================================================
+   Piezas agregadas en la S3 de E1: botón de ícono y panel del
+   gráfico grande.
+   ============================================================ */
+
+/* --- Botón redondo con un símbolo, sobre una tarjeta de gráfico ---
+   Va arriba a la derecha, al lado de la marca de TradingView. */
+.boton-icono {
+  position: absolute;
+  top: 10px;
+  right: 52px;
+  z-index: 2;                 /* Encima del widget */
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--borde);
+  border-radius: 50%;
+  background: var(--fondo);
+  color: var(--acento);
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.boton-icono:hover { border-color: var(--acento); }
+
+/* Zona de toque de 44 px sin agrandar el círculo */
+.boton-icono::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+}
+
+/* --- Gráfico grande --- */
+.tarjeta--grafico-grande { height: 520px; }
+
+/* El widget grande necesita que su caja interna tenga alto */
+.tarjeta--grafico-grande .tradingview-widget-container__widget {
+  width: 100%;
+  height: 100%;
+}
+
+/* --- Panel: en laptop es un bloque más de la página; en celular
+   tapa toda la pantalla, por encima de la barra inferior --- */
+@media (max-width: 899px) {
+  .panel {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    padding: var(--e2);
+    background: var(--fondo);
+  }
+
+  .panel .panel__cabecera { margin-top: 0; }
+
+  .panel .tarjeta--grafico-grande {
+    flex: 1;                  /* El gráfico usa todo el alto que sobra */
+    height: auto;
+    min-height: 0;
+  }
+
+  /* Mientras el panel está abierto, la página de atrás no se desplaza.
+     :has() pregunta "¿este elemento contiene a tal otro?". */
+  body:has(.panel) { overflow: hidden; }
+}

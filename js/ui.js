@@ -102,6 +102,18 @@ export function boton(texto, alPulsar) {
   return elemento;
 }
 
+// Botón redondo con un solo símbolo (por ejemplo "⤢"). Como el símbolo no
+// dice nada a un lector de pantalla, "etiqueta" describe lo que hace.
+export function botonIcono(simbolo, etiqueta, alPulsar) {
+  const elemento = crear("button", {
+    clase: "boton-icono",
+    texto: simbolo,
+    atributos: { type: "button", "aria-label": etiqueta, title: etiqueta }
+  });
+  elemento.addEventListener("click", alPulsar);
+  return elemento;
+}
+
 // Pestañas. opciones: [{ id, nombre }]; "activa" es el id de la pestaña abierta.
 // Al pulsar una, se marca y se llama a alCambiar(id).
 export function pestanas(opciones, activa, alCambiar) {
