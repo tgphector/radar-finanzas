@@ -1,0 +1,150 @@
+/* ============================================================
+   componentes.css · Piezas reutilizables
+   Cada módulo arma su pantalla con estas piezas (vía ui.js).
+   Un módulo NO crea estilos propios: si falta una pieza, se
+   agrega aquí y se anota en 4-decisiones.md.
+   ============================================================ */
+
+/* --- Tarjeta: caja base de casi todo --- */
+.tarjeta {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: var(--e2);
+}
+
+/* --- Cuadrícula de tarjetas: 3 columnas, 2 y luego 1 --- */
+.cuadricula {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--e2);
+}
+
+@media (max-width: 1099px) {
+  .cuadricula { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 599px) {
+  .cuadricula { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* --- Tarjeta que contiene un widget de gráfico --- */
+.tarjeta--grafico {
+  position: relative;
+  height: 220px;
+  padding: 0;
+  overflow: hidden;   /* El widget respeta las esquinas redondeadas */
+}
+
+/* Texto que se ve mientras el widget todavía no carga,
+   o si no se pudo cargar */
+.tarjeta__espera {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: var(--e2);
+  color: var(--texto-2);
+  font-size: var(--t-chico);
+  text-align: center;
+}
+
+.tarjeta__espera strong {
+  color: var(--texto);
+  font-size: var(--t-base);
+}
+
+/* El widget ocupa toda la tarjeta y queda encima del texto de espera */
+.tarjeta--grafico .tradingview-widget-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* La página se declara oscura (color-scheme: dark) y el widget no.
+   Cuando no coinciden, el navegador pinta un fondo blanco detrás del
+   widget aunque sea transparente. Con "normal" el fondo vuelve a ser
+   el de la tarjeta. */
+.tarjeta--grafico iframe { color-scheme: normal; }
+
+/* --- Línea de fuente y fecha (obligatoria en cada bloque de datos) --- */
+.fuente {
+  margin-top: var(--e2);
+  color: var(--texto-2);
+  font-size: var(--t-chico);
+}
+
+/* --- Aviso: mensajes claros cuando algo falla o falta --- */
+.aviso {
+  padding: var(--e2);
+  border: 1px solid var(--borde);
+  border-left: 3px solid var(--acento);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  color: var(--texto);
+}
+
+.aviso p + p {
+  margin-top: 4px;
+  color: var(--texto-2);
+  font-size: var(--t-chico);
+}
+
+/* --- Ayuda "?": explicación de una línea junto a un término --- */
+.ayuda {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-left: 4px;
+  padding: 0;
+  border: 1px solid var(--borde);
+  border-radius: 50%;
+  background: var(--superficie);
+  color: var(--texto-2);
+  font: inherit;
+  font-size: 0.75rem;
+  line-height: 1;
+  vertical-align: middle;
+  cursor: help;
+}
+
+/* Zona de toque más grande que el círculo (44 px) sin mover el texto */
+.ayuda::after {
+  content: "";
+  position: absolute;
+  inset: -12px;
+}
+
+.ayuda:hover, .ayuda[aria-expanded="true"] {
+  color: var(--acento);
+  border-color: var(--acento);
+}
+
+.ayuda__texto {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(260px, 70vw);
+  padding: var(--e1) 12px;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  background: var(--fondo);
+  color: var(--texto);
+  font-size: var(--t-chico);
+  line-height: 1.4;
+  text-align: left;
+  z-index: 5;
+}
+
+.ayuda:hover .ayuda__texto,
+.ayuda:focus-visible .ayuda__texto,
+.ayuda[aria-expanded="true"] .ayuda__texto { display: block; }

@@ -1,0 +1,76 @@
+{
+  "nota": "Lista de símbolos de Mis gráficas. Referencia: 2-arquitectura.md, sección 11. 'tv' es el símbolo con su bolsa en formato TradingView.",
+  "revisado": "2026-11-10",
+  "favoritos": ["IVV", "IVW", "NVDA", "EPU", "IEMG", "BAP"],
+  "pestanas": [
+    {
+      "id": "populares",
+      "nombre": "Populares",
+      "simbolos": [
+        { "simbolo": "NVDA", "tv": "NASDAQ:NVDA", "nombre": "NVIDIA" },
+        { "simbolo": "AAPL", "tv": "NASDAQ:AAPL", "nombre": "Apple" },
+        { "simbolo": "MSFT", "tv": "NASDAQ:MSFT", "nombre": "Microsoft" },
+        { "simbolo": "AMZN", "tv": "NASDAQ:AMZN", "nombre": "Amazon" },
+        { "simbolo": "GOOGL", "tv": "NASDAQ:GOOGL", "nombre": "Alphabet (Google)" },
+        { "simbolo": "META", "tv": "NASDAQ:META", "nombre": "Meta" },
+        { "simbolo": "TSLA", "tv": "NASDAQ:TSLA", "nombre": "Tesla" },
+        { "simbolo": "PLTR", "tv": "NASDAQ:PLTR", "nombre": "Palantir" },
+        { "simbolo": "AMD", "tv": "NASDAQ:AMD", "nombre": "AMD" },
+        { "simbolo": "NFLX", "tv": "NASDAQ:NFLX", "nombre": "Netflix" },
+        { "simbolo": "AVGO", "tv": "NASDAQ:AVGO", "nombre": "Broadcom" },
+        { "simbolo": "INTC", "tv": "NASDAQ:INTC", "nombre": "Intel" }
+      ]
+    },
+    {
+      "id": "etfs",
+      "nombre": "ETFs",
+      "simbolos": [
+        { "simbolo": "IVV", "tv": "AMEX:IVV", "nombre": "iShares Core S&P 500" },
+        { "simbolo": "IVW", "tv": "AMEX:IVW", "nombre": "iShares S&P 500 Growth" },
+        { "simbolo": "IYE", "tv": "AMEX:IYE", "nombre": "iShares U.S. Energy" },
+        { "simbolo": "EPU", "tv": "AMEX:EPU", "nombre": "iShares MSCI Peru" },
+        { "simbolo": "REET", "tv": "AMEX:REET", "nombre": "iShares Global REIT" },
+        { "simbolo": "VWO", "tv": "AMEX:VWO", "nombre": "Vanguard Emerging Markets" },
+        { "simbolo": "IBIT", "tv": "NASDAQ:IBIT", "nombre": "iShares Bitcoin Trust" },
+        { "simbolo": "IEMG", "tv": "AMEX:IEMG", "nombre": "iShares Core MSCI Emerging Markets" },
+        { "simbolo": "XLI", "tv": "AMEX:XLI", "nombre": "Industrial Select Sector SPDR" },
+        { "simbolo": "ITA", "tv": "AMEX:ITA", "nombre": "iShares U.S. Aerospace & Defense" },
+        { "simbolo": "XLB", "tv": "AMEX:XLB", "nombre": "Materials Select Sector SPDR" },
+        { "simbolo": "ICLN", "tv": "NASDAQ:ICLN", "nombre": "iShares Global Clean Energy" }
+      ]
+    },
+    {
+      "id": "otros",
+      "nombre": "Otros",
+      "simbolos": [
+        { "simbolo": "BRK-B", "tv": "NYSE:BRK.B", "nombre": "Berkshire Hathaway B" },
+        { "simbolo": "SPYG", "tv": "AMEX:SPYG", "nombre": "SPDR Portfolio S&P 500 Growth" },
+        { "simbolo": "BAP", "tv": "NYSE:BAP", "nombre": "Holding financiero peruano" },
+        { "simbolo": "SAN", "tv": "NYSE:SAN", "nombre": "Banco Santander" },
+        { "simbolo": "BAC", "tv": "NYSE:BAC", "nombre": "Bank of America" },
+        { "simbolo": "NU", "tv": "NYSE:NU", "nombre": "Nu Holdings" },
+        { "simbolo": "KO", "tv": "NYSE:KO", "nombre": "Coca-Cola" },
+        { "simbolo": "F", "tv": "NYSE:F", "nombre": "Ford" },
+        { "simbolo": "XOM", "tv": "NYSE:XOM", "nombre": "Exxon Mobil" },
+        { "simbolo": "OXY", "tv": "NYSE:OXY", "nombre": "Occidental Petroleum" },
+        { "simbolo": "DVN", "tv": "NYSE:DVN", "nombre": "Devon Energy" },
+        { "simbolo": "DELL", "tv": "NYSE:DELL", "nombre": "Dell Technologies" },
+        { "simbolo": "VRSN", "tv": "NASDAQ:VRSN", "nombre": "VeriSign" },
+        { "simbolo": "INGM", "tv": "NYSE:INGM", "nombre": "Ingram Micro" },
+        { "simbolo": "PRYMY", "tv": "OTC:PRYMY", "nombre": "Prysmian (ADR)" },
+        { "simbolo": "QUBT", "tv": "NASDAQ:QUBT", "nombre": "Quantum Computing Inc." },
+        { "simbolo": "QBTS", "tv": "NYSE:QBTS", "nombre": "D-Wave Quantum" },
+        { "simbolo": "RGTI", "tv": "NASDAQ:RGTI", "nombre": "Rigetti Computing" }
+      ]
+    },
+    {
+      "id": "referencias",
+      "nombre": "Referencias",
+      "simbolos": [
+        { "simbolo": "SPYM", "tv": "AMEX:SPYM", "nombre": "S&P 500 (SPDR Portfolio, antes SPLG)" },
+        { "simbolo": "IAU", "tv": "AMEX:IAU", "nombre": "Oro (iShares Gold Trust)" },
+        { "simbolo": "USD/PEN", "tv": "FX_IDC:USDPEN", "nombre": "Dólar en soles" }
+      ]
+    }
+  ]
+}

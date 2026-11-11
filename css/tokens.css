@@ -1,0 +1,40 @@
+/* ============================================================
+   tokens.css · Design system de Radar
+   Aquí viven los valores que se repiten en toda la página
+   (colores, espacios, tipografía). Si cambia un color, se
+   cambia solo aquí. Referencia: 2-arquitectura.md, sección 10.
+   ============================================================ */
+
+:root {
+  /* --- Colores --- */
+  --fondo: #0E0F11;        /* Fondo general */
+  --superficie: #17191C;   /* Tarjetas */
+  --borde: #26292E;        /* Bordes finos */
+  --texto: #EDEDED;        /* Títulos y cifras */
+  --texto-2: #9AA0A6;      /* Etiquetas, fechas, fuentes */
+  --acento: #22C5D6;       /* Menú activo, botones, enlaces */
+  --acento-suave: rgba(34, 197, 214, 0.12); /* Fondo del elemento activo */
+  --sube: #2EBD85;         /* SOLO variaciones positivas (con ▲ o +) */
+  --baja: #F0616D;         /* SOLO variaciones negativas (con ▼ o −) */
+
+  /* --- Espacios: múltiplos de 8 px --- */
+  --e1: 8px;
+  --e2: 16px;
+  --e3: 24px;
+  --e4: 32px;
+  --e6: 48px;
+
+  /* --- Formas --- */
+  --radio: 12px;           /* Esquinas de tarjetas */
+  --toque: 44px;           /* Tamaño mínimo de un botón */
+
+  /* --- Tipografía --- */
+  --fuente: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --t-chico: 0.8125rem;    /* 13 px: fuentes, fechas */
+  --t-base: 1rem;          /* 16 px: texto normal */
+  --t-titulo: 1.75rem;     /* 28 px: título del módulo */
+
+  /* --- Medidas del esqueleto --- */
+  --menu-ancho: 88px;      /* Menú lateral en laptop */
+  --barra-alto: 64px;      /* Barra inferior en celular */
+}

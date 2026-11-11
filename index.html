@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- noindex: el enlace funciona, pero Radar no aparece en buscadores -->
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#0E0F11">
+  <title>Radar</title>
+
+  <!-- Estilos: primero los valores (tokens), luego el esqueleto y las piezas -->
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/componentes.css">
+</head>
+<body>
+
+  <!-- MENÚ: lateral en laptop, barra inferior en celular.
+       Los enlaces los dibuja app.js a partir de los módulos registrados. -->
+  <nav class="menu" aria-label="Módulos de Radar">
+    <a class="menu__marca" href="#/graficas" aria-label="Radar, ir al inicio">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+        <circle cx="14" cy="14" r="11"/>
+        <circle cx="14" cy="14" r="5.5" opacity="0.55"/>
+        <path d="M14 14 L22 7"/>
+        <circle cx="14" cy="14" r="1.4" fill="currentColor" stroke="none"/>
+      </svg>
+      Radar
+    </a>
+    <ul class="menu__lista" id="menu-lista"></ul>
+  </nav>
+
+  <div class="pagina">
+
+    <!-- CONTENIDO: aquí se dibuja el módulo elegido -->
+    <main class="contenido">
+      <div class="sello">
+        <svg width="20" height="20" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <circle cx="14" cy="14" r="11"/>
+          <path d="M14 14 L22 7"/>
+          <circle cx="14" cy="14" r="1.6" fill="currentColor" stroke="none"/>
+        </svg>
+        Radar
+      </div>
+      <div id="contenido">
+        <!-- Si JavaScript no carga, se ve este mensaje en lugar de una página vacía -->
+        <noscript>Radar necesita JavaScript para funcionar. Actívalo en tu navegador y recarga la página.</noscript>
+      </div>
+    </main>
+
+    <!-- PIE: aviso fijo en todas las pantallas (regla de producto) -->
+    <footer class="pie">
+      <p>Herramienta informativa y educativa. No es asesoría financiera. Tasas referenciales; confirma con cada entidad.</p>
+      <p>Gráficos y cotizaciones: <a href="https://www.tradingview.com/" target="_blank" rel="noopener">TradingView</a>.</p>
+    </footer>
+
+  </div>
+
+  <!-- type="module": permite que cada archivo .js importe a los otros
+       (import / export) en lugar de cargar todo en un solo archivo -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
