@@ -43,6 +43,8 @@ Una línea por decisión. Lo más nuevo arriba.
 | 10 nov 2026 | Construcción por entregables sobre un esqueleto mínimo | Práctica validada (walking skeleton, Shape Up) |
 
 ## Pendientes
+- Confirmar con Héctor el nombre de la pestaña "ETFs" (S2).
+- Decidir si BAP sigue en favoritos: el widget muestra el nombre real de la empresa (S2).
 - Verificar en la S2 los 39 símbolos que aún no se han visto en TradingView (más riesgo: PRYMY, USD/PEN, IBIT, INGM, ITA).
 - Verificar en la S2 si el widget de cotizaciones trae el rango del día.
 - Confirmar si la SBS permite leer las tasas con un script (E2/E3).

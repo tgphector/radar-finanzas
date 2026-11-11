@@ -25,6 +25,8 @@ Eres mi socio de desarrollo para construir Radar, una web personal de herramient
 - Prueba local: `python3 -m http.server` en la raíz y abrir `http://localhost:8000`. Con doble clic en `index.html` no funciona (los módulos y `simbolos.json` no cargan desde un archivo local).
 - Los widgets de TradingView necesitan internet; si el entorno no llega a TradingView, se revisan en la página publicada.
 - Cada parte terminada es un commit con mensaje en español, subido a `main`. Después de subir, revisa la página publicada y muéstrame el enlace.
+- Antes del primer commit en un equipo nuevo, revisa `git config user.name` y `git config user.email`: los commits son públicos, así que se usa el correo `noreply` de GitHub y no un correo personal. Si no está configurado, avísame antes de hacer el commit.
+- GitHub Pages ya está activo (rama `main`, carpeta raíz). Si la página deja de publicarse, se revisa en Settings → Pages del repositorio.
 
 ## Reglas de producto (no negociables)
 - Sin consejos ni recomendaciones de compra o venta. Sin portafolios por perfil.
@@ -52,7 +54,7 @@ Actualizado: 11 nov 2026, cierre de la S1 de E1 y limpieza de datos personales d
 **En curso:** E1 · Esqueleto + Mis gráficas. Sesión 1 de 3 hecha.
 
 **Hecho**
-- Repositorio y GitHub Pages activos.
+- Repositorio y GitHub Pages activos. El repositorio se recreó el 11 nov 2026 con un historial limpio.
 - Esqueleto: menú lateral (laptop) y barra inferior (celular), router (`#/graficas`, `#/plazos`), design system, pie con aviso, `memoria.js`, `ui.js`.
 - Mis gráficas: 6 tarjetas de favoritos con mini gráfico de TradingView (último año), carga diferida, línea de fuente y hora, ayuda "?" en ETF.
 - Plazos fijos aparece en el menú como "Próximamente".
@@ -67,4 +69,14 @@ Actualizado: 11 nov 2026, cierre de la S1 de E1 y limpieza de datos personales d
 
 **Después (S3 de E1):** gráfico grande con selector 1d / 5d / 1m / 1a / 5a y pruebas finales.
 
-**Pendientes abiertos:** ver la sección "Pendientes" de `docs/decisiones.md`.
+**Decisiones que debo preguntarle a Héctor al iniciar la S2**
+1. Nombre de la pestaña "ETFs": quedó así, sin subgrupos, por la regla de privacidad. ¿Se queda o prefiere otro nombre?
+2. BAP: sigue en favoritos. En `simbolos.json` lleva un nombre genérico, pero el widget de TradingView muestra el nombre real de la empresa. ¿Se queda en favoritos, pasa solo a "Otros" o sale de la lista?
+3. Si algún símbolo no carga en TradingView: corregir la bolsa, marcarlo "sin datos" o quitarlo.
+
+**Notas técnicas para retomar**
+- La tabla de la S2 usa un widget de cotizaciones de TradingView en formato iframe, igual que el mini gráfico. Antes de escribirlo, confirma en la documentación de widgets de TradingView el nombre del script y sus opciones; no lo des por sabido.
+- `simbolos.json` ya tiene los 45 símbolos por pestaña; la bolsa de cada uno (`tv`) está puesta de memoria y solo se comprobaron los 6 favoritos.
+- Los iframes de TradingView no se pueden leer desde el código (son de otro sitio): que un símbolo carga se comprueba mirando la página.
+
+**Pendientes abiertos:** ver también la sección "Pendientes" de `docs/decisiones.md`.
