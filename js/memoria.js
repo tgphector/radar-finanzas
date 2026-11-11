@@ -51,6 +51,39 @@ export const memoria = {
     }
   },
 
+  // Todo lo personal guardado por Radar, como un objeto { clave: valor }.
+  // Sirve para el respaldo (Exportar). No incluye las copias de datos
+  // públicos (radar.datos.*), que se vuelven a bajar solas.
+  todo() {
+    const salida = {};
+    try {
+      for (let i = 0; i < localStorage.length; i++) {
+        const nombre = localStorage.key(i);
+        if (!nombre.startsWith("radar.") || nombre.startsWith("radar.datos.") || nombre === "radar.prueba") continue;
+        salida[nombre] = JSON.parse(localStorage.getItem(nombre));
+      }
+    } catch (error) {
+      // Si el almacén está bloqueado se devuelve lo que se haya podido leer
+    }
+    return salida;
+  },
+
+  // Restaura un respaldo (Importar). Solo acepta claves de Radar.
+  // Devuelve cuántos datos guardó, o -1 si el navegador no dejó guardar.
+  restaurar(objeto) {
+    let guardados = 0;
+    try {
+      for (const [nombre, valor] of Object.entries(objeto)) {
+        if (!nombre.startsWith("radar.") || nombre.startsWith("radar.datos.")) continue;
+        localStorage.setItem(nombre, JSON.stringify(valor));
+        guardados++;
+      }
+    } catch (error) {
+      return -1;
+    }
+    return guardados;
+  },
+
   // Prueba si el navegador deja guardar. Sirve para mostrar un aviso
   // una sola vez en lugar de fallar en silencio.
   disponible() {

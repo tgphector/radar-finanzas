@@ -40,6 +40,8 @@ function leerHoja(nombre) {
 function limpiarCelda(valor) {
   if (Object.prototype.toString.call(valor) === "[object Date]") return fechaTexto(valor);
   if (valor === "") return null;
+  // Una fórmula con error (#N/A, #REF!…) se entrega como dato vacío, no como texto
+  if (typeof valor === "string" && valor.charAt(0) === "#") return null;
   return valor;
 }
 

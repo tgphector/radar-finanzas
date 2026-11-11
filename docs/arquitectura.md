@@ -1,4 +1,6 @@
-# Arquitectura de Radar (v9, 11 nov 2026 · cierre de E2 y E3 replanificado)
+# Arquitectura de Radar (v10, 11 nov 2026 · E4 y E5 construidos)
+
+Cambios de v10: hojas `precios` y `tipo_cambio` con fórmulas, `Api.gs` genérico (recursos definidos en `fuentes`), módulos Mis reglas y Tipo de cambio, respaldo con exportar e importar.
 
 Cambios de v9: simulador de plazo fijo, hoja `historial_tasas`, procedimiento de carga quincenal, PWA (`manifest.json`, `sw.js`, íconos).
 
@@ -60,9 +62,10 @@ Archivo: **"Radar · Base de datos"** (solo para Radar; nada personal adentro).
 | `tasas_cts` | Último dato de tasas de CTS: `entidad`, `tipo`, `trea_min_pen`, `trea_max_pen`, `trea_min_usd`, `trea_max_usd`, `fsd`, `region`, `fecha_sbs`. Una fila por entidad | Carga manual, igual que `tasas_pf` |
 | `historial_tasas` | Copia fechada de las tres tablas en cada carga: `producto` (plazo_fijo o cts), `entidad`, `tipo`, `moneda`, `plazo_dias`, `monto`, `trea`, `fsd`, `region`, `fecha_sbs`, `trea_max` (solo CTS). Se agrega, nunca se borra. La app web no la entrega todavía | Quien cargue los datos |
 | `fsd` | Monto de cobertura vigente: `monto`, `moneda`, `vigente_desde`, `vigente_hasta`, `fuente`. Una fila; cambia cada trimestre | Carga manual desde fsd.org.pe |
-| `fuentes` | Una fila por recurso: `recurso`, `nombre`, `url`, `frecuencia`, `actualizado`, `estado`, `nota` | Quien cargue los datos |
+| `fuentes` | Una fila por recurso: `recurso`, `nombre`, `url`, `frecuencia`, `actualizado`, `estado`, `nota`, `hoja`. La columna `hoja` dice de qué hoja se leen los datos: es la lista de recursos que la app web entrega | Quien cargue los datos |
 | `log` | Fecha, función, resultado (ok/error) y mensaje de cada ejecución | Apps Script |
-| `precios` (E4) | Precio de cierre por símbolo y fecha | Apps Script |
+| `precios` | Una fila por símbolo: `simbolo`, `google` (clave para Google Finance), `precio`, `cierre_anterior`, `hora`, `moneda`. Las cuatro últimas son fórmulas `GOOGLEFINANCE`; la fila USD/PEN trae el tipo de cambio de mercado | Fórmulas (se actualizan solas) |
+| `tipo_cambio` | `fecha`, `interbancario_compra`, `interbancario_venta`, `sbs_compra`, `sbs_venta` de los últimos 45 días. Una sola fórmula `IMPORTDATA` en A2 sobre la API de estadísticas del BCRP; requiere que el dueño del archivo pulse "Permitir acceso" una vez | Fórmula (se actualiza sola) |
 
 Reglas:
 - La fila 1 de cada hoja es el encabezado, en minúsculas y sin espacios (`plazo_dias`), igual que los campos del JSON.
@@ -74,9 +77,9 @@ Proyecto vinculado al archivo de Sheets.
 
 ```
 Radar (Apps Script)
-├── Api.gs              # (E2 ✔) doGet(e): ?recurso=tasas|cts|fsd → JSON con fuente, fecha y estado (precios en E4)
+├── Api.gs              # (E2 ✔) doGet(e): ?recurso=… → JSON. Los recursos válidos salen de la hoja "fuentes"
 ├── ActualizarTasas.gs  # (E3, por replanificar) La SBS bloquea la lectura con UrlFetchApp
-├── ActualizarPrecios.gs  # (E4) Trae precios de cierre de la API y escribe en precios
+├── ActualizarPrecios.gs  # (descartado) Los precios salen de fórmulas GOOGLEFINANCE en la hoja "precios"
 ├── Utilidades.gs       # Leer/escribir hojas, registrar en log, caché
 └── Configuracion.gs    # Crear activadores y guardar la clave de API en PropertiesService
 ```
@@ -109,6 +112,10 @@ radar-finanzas/
 │   ├── graficas/
 │   │   ├── graficas.js        #                                                         (E1 ✔)
 │   │   └── simbolos.json      # Símbolos por pestaña y favoritos por defecto            (E1 ✔)
+│   ├── reglas/
+│   │   └── reglas.js          # Módulo "Mis reglas"                                    (E4 ✔)
+│   ├── cambio/
+│   │   └── cambio.js          # Módulo "Tipo de cambio"                                (E5 ✔)
 │   └── plazos/
 │       └── plazos.js          # Módulo "Depósitos": plazo fijo y CTS                    (E2, S2 ✔)
 ├── docs/
@@ -167,6 +174,7 @@ Reglas:
 
 - El ejemplo de arriba es ilustrativo; las filas de `tasas` traen los campos de `tasas_pf` (sección 4). Las celdas vacías llegan como `null` y las fechas como texto con zona horaria de Lima.
 - `fuente`, `url`, `actualizado`, `estado` y `nota` salen de la fila del recurso en la hoja `fuentes`.
+- Cada respuesta trae además `leido`: el momento en que la app web leyó la hoja. Es la fecha que se muestra para los datos que se actualizan con fórmulas (`precios`, `tc`), que no tienen una fecha de carga.
 - `datos.js` agrega dos campos al entregar la respuesta a un módulo: `deCopia` (true si es la última copia guardada en el navegador) y `motivo`. Si no hay red ni copia, lanza un `ErrorDatos` con motivo `sin-configurar`, `sin-conexion`, `sin-respuesta` o `formato`.
 - `estado`: `ok` o `error`. Con `error`, `datos` trae el último valor bueno y la página lo muestra con su fecha.
 - Si la API no responde, la página muestra un mensaje claro y la última copia guardada en el navegador.
@@ -175,6 +183,7 @@ Reglas:
 - **Hoy:** todo lo personal vive en el navegador (localStorage), con clave `radar.<modulo>.<dato>`.
 - **Respaldo:** botón "Exportar / Importar" con un archivo JSON, para pasar la configuración de la laptop al celular (E4).
 - **`memoria.js` es una interfaz:** los módulos solo llaman `memoria.leer()`, `memoria.guardar()` y `memoria.borrar()`. Si se decide sincronizar entre dispositivos, solo cambia `memoria.js`.
+- Para el respaldo, `memoria.todo()` devuelve todo lo personal de Radar y `memoria.restaurar()` lo vuelve a guardar. El respaldo no incluye las copias de datos públicos (`radar.datos.*`).
 - Si el navegador bloquea localStorage, Radar funciona igual con los valores por defecto (`memoria.disponible()` permite avisar que no puede recordar cambios).
 - **Sin datos personales en Sheets ni en servidores** mientras no se decida otra cosa en una revisión (Ley de Protección de Datos Personales).
 
@@ -249,6 +258,24 @@ Reglas:
 - **Fecha:** se toma de `fecha_sbs` de las filas mostradas. Con más de 15 días la etiqueta cambia a aviso.
 - **Fallas cubiertas:** app web caída con copia guardada (se muestra la copia con aviso), caída sin copia, sin conexión, hoja vacía o producto sin datos, FSD sin monto (no se afirma ninguna cifra), entidad sin cobertura verificada (se marca en su fila).
 - **Simulador (solo plazo fijo):** un campo de monto encima de la tabla. Con un monto válido la tabla suma la columna "Interés estimado" = monto × TREA / 100 (plazo de 360 días), calculada con la tasa que la SBS publica para 10 000. Una nota aclara que es un estimado y otra avisa si el monto en soles supera la cobertura del FSD. El monto se recuerda en `radar.plazos.monto` (solo en el navegador) y se quita con "Borrar". En celular la tabla simulada oculta el puesto y la barra para que entren las cifras.
+
+## 11c. Módulo Mis reglas
+
+- Archivo `modulos/reglas/reglas.js`; identificador `reglas`, dirección `#/reglas`. Pide el recurso `precios`.
+- **Posición** (guardada en `radar.reglas.posiciones`, solo en el navegador): `id`, `simbolo`, `compra`, `objetivo` (%), `limite` (% o null), `cadaDias` (o null), `revisado` (fecha de la última revisión, "aaaa-mm-dd").
+- **Evaluación:** variación = precio / compra − 1. "Objetivo alcanzado" si la variación llega al objetivo; "Límite alcanzado" si baja hasta el límite; "Toca revisar" si pasaron `cadaDias` desde `revisado` (el botón "Revisado hoy" reinicia la cuenta). Sin avisos se muestra "En curso".
+- **Vista:** resumen, una tarjeta por posición (variación en verde o rojo con flecha y signo), formulario para agregar, fuente y hora de los precios, y la nota de que Radar no recomienda.
+- **Respaldo:** "Exportar" descarga `radar-respaldo-<fecha>.json` con `memoria.todo()`; "Importar" lo lee y lo guarda con `memoria.restaurar()`.
+- **Fallas cubiertas:** precios caídos (las posiciones se ven sin variación y no se puede agregar), copia guardada, almacenamiento bloqueado, archivo de respaldo inválido.
+
+## 11d. Módulo Tipo de cambio
+
+- Archivo `modulos/cambio/cambio.js`; identificador `cambio`, dirección `#/cambio`. Pide los recursos `tc` y `precios`.
+- **Dólar hoy:** tarjetas de sistema bancario (SBS) e interbancario con compra y venta (último día con dato del BCRP y variación de la venta frente al día anterior), y tarjeta de mercado con la fila USD/PEN de `precios`. Cada fuente con su línea de fuente y fecha.
+- **Conversor:** sentido ("Tengo soles" / "Tengo dólares") y monto; un resultado por tipo de cambio disponible. El monto no se guarda.
+- **Últimos días:** tabla de los últimos 10 días con dato.
+- El BCRP escribe las fechas como "10.Nov.26" y los días sin dato como "n.d."; el módulo los interpreta y descarta.
+- **Fallas cubiertas:** falta una de las dos fuentes (se muestra la otra con una nota), faltan las dos, copia guardada.
 
 ## 12. Operación
 - **Carga quincenal de tasas (manual).** La SBS no se puede leer con un script. Pasos: (1) Héctor imprime a PDF, desde el aplicativo de la SBS, las tres tablas de Lima (plazo fijo en soles por S/ 10 000 a 360 días, plazo fijo en dólares por US$ 10 000 a 360 días y CTS) y las pasa en el chat; (2) Claude lee los PDF (`pdftotext -layout`), compara el número de entidades con la carga anterior y reemplaza `tasas_pf` y `tasas_cts` con el conector de Sheets; (3) copia las filas nuevas al final de `historial_tasas`; (4) actualiza `actualizado` en `fuentes`; (5) revisa la página publicada pasados 5 minutos (caché de la app web). Si un PDF viene incompleto, no se reemplaza nada.

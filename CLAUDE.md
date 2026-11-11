@@ -49,43 +49,36 @@ Eres mi socio de desarrollo para construir Radar, una web personal de herramient
 Directo, breve, en español. Si mi idea complica el proyecto o choca con una decisión anterior, dímelo claro.
 
 ## Estado actual
-Actualizado: 11 nov 2026, cierre de E2 y de lo construible de E3.
+Actualizado: 11 nov 2026, E4 y E5 construidos y a la espera de dos pasos de Héctor para publicarlos.
 
-**En curso:** la **Revisión** posterior a E3. Necesita a Héctor: no hay ningún entregable abierto que Claude pueda avanzar solo.
+**En curso:** E4 · Mis reglas y E5 · Tipo de cambio. Están construidos y probados en local con datos simulados, **en la rama de trabajo, no en `main`**. Para publicarlos falta que Héctor haga dos pasos (abajo).
 
-**Terminado**
-- E1 · Esqueleto + Mis gráficas (11 nov 2026).
-- E2 · Depósitos: plazo fijo y CTS (11 nov 2026). Falta solo que Héctor confirme que usó el simulador.
-- E3 · replanificado y construido (11 nov 2026): carga manual quincenal, `historial_tasas`, aviso de datos viejos, PWA. Faltan el uso de Héctor y la decisión del contador de visitas.
+**Terminado y publicado**
+- E1 · Esqueleto + Mis gráficas.
+- E2 · Depósitos: plazo fijo y CTS, con simulador.
+- E3 · Carga manual quincenal, `historial_tasas`, aviso de datos viejos y PWA (replanificado; sin contador de visitas).
 
-**Qué hay publicado**
-- Mis gráficas: favoritos, tabla por pestañas, chips, "Editar", gráfico grande con periodos y buscador.
-- Depósitos (`#/plazos`): ranking por TREA de plazo fijo (soles y dólares) y CTS, fecha de los datos visible, nota del FSD y simulador de plazo fijo con interés estimado.
-- Radar instalable como app y con uso sin conexión (última copia).
-- Datos: archivo "Radar · Base de datos" en Google Sheets (`tasas_pf`, `tasas_cts`, `historial_tasas`, `fsd`, `fuentes`, `log`) servido por la app web de Apps Script (`?recurso=tasas|cts|fsd`). Datos de la SBS al 11 nov 2026.
+**Lo que falta para publicar E4 y E5**
+1. Héctor: en Apps Script, reemplazar `Api.gs` y `Utilidades.gs` por los de `apps-script/` y crear una versión nueva de la misma implementación. Desde esta versión los recursos se definen en la hoja `fuentes` y no hará falta republicar para sumar otro.
+2. Héctor: abrir la hoja `tipo_cambio` del archivo y pulsar "Permitir acceso" (hoy la fórmula del BCRP da #REF!).
+3. Claude: comprobar que la app web entrega `precios` y `tc` con datos reales (en especial que Apps Script lee bien los valores de `GOOGLEFINANCE`), probar los dos módulos en local con datos reales, pasar la rama a `main` y verificar en la página publicada. Si la rama y `main` difieren al iniciar la sesión, es por esto.
 
-**Próxima sesión: Revisión (1 sesión, con Héctor)**
-1. Qué se usa y qué no: Mis gráficas, Depósitos, simulador, app instalada.
-2. Revisar las decisiones del 11 nov 2026 marcadas "Decidido por Claude" en `docs/decisiones.md` (simulador, memoria del monto, PWA, historial, contador).
-3. Decidir el contador de visitas (opciones en `docs/backlog.md`, E3).
-4. Decidir qué entregable sigue y detallarlo: E4 Mis reglas, Fundamentales, E5 Tipo de cambio, E6 Calculadoras. Ninguno está detallado todavía.
-5. Si toca por fecha: carga quincenal de las tres tablas (hacia el 26 nov 2026) y monto nuevo del FSD (desde diciembre).
+**Después: E6 · Calculadoras.** Falta que Héctor elija cuáles; la lista propuesta y la recomendación están en `docs/backlog.md`.
 
-**Lo que cada entregable siguiente necesita de Héctor antes de empezar**
-- E4 Mis reglas: las reglas que quiere seguir y elegir una API de precios con su clave (va en `PropertiesService`).
-- Fundamentales: elegir la API (candidatas en `docs/backlog.md`) y su clave.
-- E5 Tipo de cambio: definir la fuente del dato.
-- E6 Calculadoras: definir qué calculadoras; es el único que no necesita datos externos.
+**Decisiones abiertas con Héctor**
+1. Qué calculadoras entran en E6.
+2. Revisar las decisiones del 11 nov 2026 marcadas "Decidido por Claude" en `docs/decisiones.md` (diseño de Mis reglas, precios desde `GOOGLEFINANCE`, tipo de cambio, simulador, PWA).
+3. Contador de visitas (opciones en `docs/backlog.md`, E3).
 
 **Notas técnicas para retomar**
-- La SBS bloquea a los robots (Incapsula): no se puede leer desde el entorno de Claude ni desde Apps Script. No intentar saltarse la protección. Los datos entran por PDF que pasa Héctor; el procedimiento de carga está en `docs/arquitectura.md`, sección 12.
-- Radar mantiene solo tres tablas de la SBS, todas de Lima. No pedir otros montos ni regiones.
-- El archivo de Sheets se edita con el conector de Google Sheets (buscarlo en Drive por su título; su identificador no se guarda en el repositorio). Después de cambiar la hoja, la app web tarda hasta 5 minutos en reflejarlo.
-- Si se cambia `Api.gs` o `Utilidades.gs`, Héctor debe pegar el código nuevo y crear una versión nueva de la misma implementación.
-- Al agregar archivos nuevos a Radar, sumarlos a la lista `BASE` de `sw.js`.
+- Hoja de Sheets "Radar · Base de datos": `tasas_pf`, `tasas_cts`, `historial_tasas`, `precios` (fórmulas `GOOGLEFINANCE`), `tipo_cambio` (fórmula `IMPORTDATA` del BCRP), `fsd`, `fuentes`, `log`. Se edita con el conector de Google Sheets (buscarla en Drive por su título; su identificador no va en el repositorio). La app web tarda hasta 5 minutos en reflejar un cambio.
+- La SBS bloquea a los robots: no se puede leer desde el entorno de Claude ni desde Apps Script. No intentar saltarse la protección. Los datos de depósitos entran por PDF que pasa Héctor; procedimiento en `docs/arquitectura.md`, sección 12. Solo tres tablas, todas de Lima.
+- La API de estadísticas del BCRP sí responde sin protección (`estadisticas.bcrp.gob.pe/estadisticas/series/api/<series>/<formato>/<desde>/<hasta>/esp`).
+- Fechas pendientes: carga quincenal de la SBS hacia el 26 nov 2026; monto del FSD nuevo desde diciembre.
+- Al agregar archivos nuevos a Radar, sumarlos a la lista `BASE` de `sw.js` y cambiar el nombre `CACHE`.
 - Esta sesión en la nube no puede controlar la laptop de Héctor ni su navegador.
-- Entorno "radar-finanzas": permite TradingView, la página publicada, la SBS, `fsd.org.pe`, `script.google.com` y `script.googleusercontent.com`.
-- En las pruebas con navegador automático, simular una parte de la app web y dejar pasar el resto puede hacer fallar un pedido real; conviene simular todo o nada.
+- Entorno "radar-finanzas": permite TradingView, la página publicada, la SBS, `fsd.org.pe`, `estadisticas.bcrp.gob.pe`, `script.google.com` y `script.googleusercontent.com`.
+- En las pruebas con navegador automático, para simular solo algunos recursos de la app web conviene responder los demás con `route.fetch()` y `fulfill`, no con `continue()`.
 - TradingView cambia sus widgets sin aviso; si uno sale vacío en las pruebas, revisar primero si el entorno bloquea un sitio nuevo. Las capturas de página completa muestran vacíos los gráficos fuera de pantalla.
 - Commits con identidad genérica (`Claude <noreply@anthropic.com>`). Se trabaja en una rama y se pasa a `main` al cerrar la sesión.
 

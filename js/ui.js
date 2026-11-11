@@ -186,8 +186,12 @@ export function interruptor(etiqueta, encendido, alCambiar, titulo) {
 
 // Etiqueta: dato corto y destacado (por ejemplo, la fecha de los datos).
 // alerta: true la pinta como advertencia (datos viejos).
-export function etiqueta(texto, { alerta = false } = {}) {
-  return crear("span", { clase: alerta ? "etiqueta etiqueta--alerta" : "etiqueta", texto });
+// neutra: true la pinta apagada (estado normal, sin nada que avisar).
+export function etiqueta(texto, { alerta = false, neutra = false } = {}) {
+  let clase = "etiqueta";
+  if (alerta) clase += " etiqueta--alerta";
+  if (neutra) clase += " etiqueta--neutra";
+  return crear("span", { clase, texto });
 }
 
 // Tabla propia de Radar.
@@ -224,15 +228,17 @@ export function tabla(columnas, filas, descripcion) {
 // Llama a alCambiar(numero | null) cada vez que el usuario escribe.
 // Devuelve { elemento, ponerPrefijo(texto), ponerValor(numero | null) }.
 // inputmode="decimal" hace que el celular muestre el teclado de números.
-export function campoMonto(etiquetaTexto, { valor = null, prefijo = "", maximo = 999999999, alCambiar } = {}) {
+// "sufijo" va después del número (por ejemplo "%" o "días") y "ejemplo" es el texto gris de muestra.
+export function campoMonto(etiquetaTexto, { valor = null, prefijo = "", sufijo = "", ejemplo = "10 000", maximo = 999999999, alCambiar } = {}) {
   const elemento = crear("label", { clase: "campo" });
   const caja = crear("span", { clase: "campo__caja" });
   const marca = crear("span", { clase: "campo__prefijo", texto: prefijo });
   const entrada = crear("input", {
     clase: "campo__entrada",
-    atributos: { type: "text", inputmode: "decimal", autocomplete: "off", placeholder: "10 000" }
+    atributos: { type: "text", inputmode: "decimal", autocomplete: "off", placeholder: ejemplo }
   });
   if (valor !== null) entrada.value = String(valor);
+  if (sufijo) entrada.classList.add("campo__entrada--corta");
 
   // Del texto escrito se toma solo el número: "10 000", "10,000" y "10000" valen lo mismo
   const leer = () => {
@@ -250,13 +256,58 @@ export function campoMonto(etiquetaTexto, { valor = null, prefijo = "", maximo =
   });
 
   caja.append(marca, entrada);
+  if (sufijo) caja.append(crear("span", { clase: "campo__prefijo", texto: sufijo }));
   elemento.append(crear("span", { clase: "campo__etiqueta", texto: etiquetaTexto }), caja);
   return {
     elemento,
+    valor: leer,
     ponerPrefijo(texto) { marca.textContent = texto; },
     ponerValor(numero) {
       entrada.value = numero === null ? "" : String(numero);
       entrada.setAttribute("aria-invalid", "false");
     }
   };
+}
+
+// ------------------------------------------------------------
+// Piezas agregadas en E4 y E5
+// ------------------------------------------------------------
+
+// Lista desplegable. opciones: [{ id, nombre }]. Devuelve { elemento, valor() }.
+export function selector(etiquetaTexto, opciones, { valor, alCambiar } = {}) {
+  const elemento = crear("label", { clase: "campo" });
+  const lista = crear("select", { clase: "campo__lista" });
+  for (const opcion of opciones) {
+    const item = crear("option", { texto: opcion.nombre, atributos: { value: opcion.id } });
+    if (opcion.id === valor) item.selected = true;
+    lista.append(item);
+  }
+  if (alCambiar) lista.addEventListener("change", () => alCambiar(lista.value));
+  elemento.append(crear("span", { clase: "campo__etiqueta", texto: etiquetaTexto }), lista);
+  return { elemento, valor: () => lista.value };
+}
+
+// Variación con flecha y signo: "▲ +1.25 %" o "▼ −0.80 %".
+// Regla de producto: verde y rojo solo para subidas y bajadas, siempre con flecha o signo.
+// texto: lo que se muestra después de la flecha (ya con su signo).
+export function variacion(numero, texto) {
+  if (numero > 0) return crear("span", { clase: "variacion variacion--sube", texto: `▲ ${texto}` });
+  if (numero < 0) return crear("span", { clase: "variacion variacion--baja", texto: `▼ ${texto}` });
+  return crear("span", { clase: "variacion", texto: `= ${texto}` });
+}
+
+// Tarjeta de un dato: título chico, cifra grande y una línea de detalle debajo.
+// "cifra" y "detalle" pueden ser texto o elementos ya armados.
+export function dato(titulo, cifra, detalle) {
+  const caja = tarjeta("dato");
+  caja.append(crear("p", { clase: "dato__titulo", texto: titulo }));
+  const grande = crear("p", { clase: "dato__cifra" });
+  grande.append(cifra);
+  caja.append(grande);
+  if (detalle) {
+    const linea = crear("p", { clase: "dato__detalle" });
+    linea.append(detalle);
+    caja.append(linea);
+  }
+  return caja;
 }

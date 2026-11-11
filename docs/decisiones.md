@@ -4,6 +4,17 @@ Una línea por decisión. Lo más nuevo arriba.
 
 | Fecha | Decisión | Motivo |
 |---|---|---|
+| 11 nov 2026 | E2 y E3 cerrados con el uso confirmado por Héctor. La tabla de plazo fijo en dólares es por US$ 10 000 (confirmado) | Cierre de entregables |
+| 11 nov 2026 | Orden después de E3: E4 Mis reglas y E5 Tipo de cambio (construidos juntos), luego E6 Calculadoras. Reemplaza a la revisión formal | Decisión de Héctor en conversación |
+| 11 nov 2026 | **Precios desde `GOOGLEFINANCE` en la hoja `precios`**, sin API con clave ni `ActualizarPrecios.gs`. Reemplaza a "Precios para Mis reglas vía API con clave en PropertiesService" | Decidido por Claude: no exige cuenta ni clave, se actualiza solo y la app web ya sabe leer hojas. Riesgo anotado en el backlog (condiciones de uso de Google) |
+| 11 nov 2026 | Mis reglas usa el último precio con retraso (hasta 20 minutos), no el cierre del día anterior. Muestra la hora en que se leyó | Decidido por Claude: es el dato que entrega la hoja y es más útil; sigue sin ser tiempo real |
+| 11 nov 2026 | Mis reglas: una posición es símbolo + precio de compra + objetivo de subida (%) + límite de bajada (%, opcional) + revisar cada N días (opcional). Sin cantidades ni montos. Avisos: "Objetivo alcanzado", "Límite alcanzado", "Toca revisar"; si no, "En curso". Solo los 45 símbolos de la lista | Decidido por Claude con "haz lo recomendado" de Héctor. Menos datos personales y sin lenguaje de recomendación |
+| 11 nov 2026 | Respaldo: "Exportar" e "Importar" viven en Mis reglas y cubren todo lo personal de Radar (`memoria.todo()` y `memoria.restaurar()`); no incluyen las copias de datos públicos | Estaba previsto en la arquitectura para E4 |
+| 11 nov 2026 | Tipo de cambio: BCRP por fórmula `IMPORTDATA` en la hoja `tipo_cambio` (API pública de estadísticas, series PD04637PD a PD04640PD) y valor de mercado de Google en la fila USD/PEN de `precios`. Sin Apps Script propio ni activadores | Fuentes elegidas por Héctor. La API del BCRP responde sin protección contra robots y las fórmulas se actualizan solas |
+| 11 nov 2026 | Tipo de cambio muestra SBS e interbancario (compra y venta) y el valor de Google por separado, sin promediar. El conversor usa venta para pasar de soles a dólares y compra para lo contrario. El monto no se guarda | Decidido por Claude: cada fuente mide algo distinto y mezclarlas inventaría un dato |
+| 11 nov 2026 | **`Api.gs` es genérico:** los recursos se definen en la hoja `fuentes` (columna nueva `hoja`). Sumar un recurso ya no exige tocar el código ni volver a publicar. Cada respuesta trae además `leido` (momento en que la app leyó la hoja). Las celdas con error de fórmula se entregan vacías | Evitar que Héctor tenga que republicar la app web por cada recurso; `leido` sirve de fecha para los datos que se actualizan con fórmulas |
+| 11 nov 2026 | Menú con cuatro módulos: Mis gráficas, Depósitos, Mis reglas, Tipo de cambio | Orden de construcción |
+| 11 nov 2026 | Componentes nuevos compartidos: lista desplegable, variación con flecha, tarjeta de dato, formulario, pila y tarjeta de posición; `campoMonto` acepta sufijo y `etiqueta` un estado neutro | Regla de arquitectura: lo nuevo y compartido se anota |
 | 11 nov 2026 | **E2 terminado** (falta solo que Héctor confirme el uso del simulador). **E3 replanificado y construido** en lo posible: carga manual quincenal, hoja `historial_tasas`, aviso de datos viejos y PWA. Sigue la revisión | Héctor pidió avanzar todos los entregables posibles en una sola tanda; las decisiones de diseño de esta tanda las tomó Claude con la opción recomendada y quedan aquí para revisarlas |
 | 11 nov 2026 | Simulador: solo para plazo fijo; suma a la tabla la columna "Interés estimado" (monto × TREA a 360 días); nota de "estimado"; aviso si el monto en soles supera la cobertura del FSD. No aplica a CTS | Decidido por Claude. En CTS el saldo cambia con cada depósito del empleador y un cálculo simple engañaría |
 | 11 nov 2026 | El monto del simulador se recuerda en el navegador (`radar.plazos.monto`) y tiene botón "Borrar". No se guarda en ningún archivo ni viaja a la hoja | Decidido por Claude. Es un dato personal: regla de producto |
@@ -96,8 +107,9 @@ Una línea por decisión. Lo más nuevo arriba.
 | 10 nov 2026 | Construcción por entregables sobre un esqueleto mínimo | Práctica validada (walking skeleton, Shape Up) |
 
 ## Pendientes
-- **Revisión posterior a E3 (necesita a Héctor):** qué se usa, qué sigue y en qué orden (E4 Mis reglas, Fundamentales, E5 a E8), y la decisión del contador de visitas.
-- Héctor: usar el simulador y Radar instalado como app al menos 3 veces para cerrar E2 y E3 según la definición de terminado.
+- **Para publicar E4 y E5 (Héctor):** pegar `Api.gs` y `Utilidades.gs` nuevos y crear una versión nueva de la implementación; abrir la hoja `tipo_cambio` y pulsar "Permitir acceso". Después Claude verifica con datos reales y pasa los módulos a `main`.
+- Elegir las calculadoras de E6 (lista en `docs/backlog.md`).
+- Contador de visitas: sigue sin decidir (opciones en `docs/backlog.md`, E3).
 - Revisar las decisiones del 11 nov 2026 marcadas "Decidido por Claude".
 - Elegir la API de "Fundamentales" y confirmar sus límites y términos (lista de candidatas en `docs/backlog.md`); verla junto con la API de precios de E4.
 - Fijar en la revisión posterior a E3 el número de "Fundamentales" y su orden frente a E4 (Mis reglas).
@@ -105,4 +117,3 @@ Una línea por decisión. Lo más nuevo arriba.
 - Replanificar E3 antes de empezarlo (alternativas en `docs/backlog.md`).
 - Actualizar la hoja `fsd` cuando el FSD publique el monto de diciembre 2026 a febrero 2027 (el actual vence el 30 nov 2026).
 - Próxima carga quincenal de las tres tablas de la SBS: hacia el 26 nov 2026.
-- Confirmar con Héctor que la tabla de plazo fijo en dólares es por US$ 10 000 (se asumió por el nombre del archivo).

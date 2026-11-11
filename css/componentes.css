@@ -625,3 +625,107 @@
   .tarjeta--lista-ancha .tabla th:last-child,
   .tarjeta--lista-ancha .tabla td:last-child { padding-right: 12px; }
 }
+
+/* ============================================================
+   Piezas agregadas en E4 y E5: lista desplegable, variación,
+   tarjeta de dato, formulario y tarjeta de posición.
+   ============================================================ */
+
+/* Campo corto (porcentajes, días) */
+.campo__entrada--corta { width: 64px; }
+
+/* --- Lista desplegable con el aspecto de los campos --- */
+.campo__lista {
+  min-height: var(--toque);
+  padding: 0 12px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: var(--fondo);
+  color: var(--texto);
+  font: inherit;
+}
+
+.campo__lista:focus { outline: 0; border-color: var(--acento); }
+
+/* --- Variación: verde o rojo SOLO aquí, y siempre con flecha y signo --- */
+.variacion { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--texto-2); }
+.variacion--sube { color: var(--sube); }
+.variacion--baja { color: var(--baja); }
+
+/* --- Tarjeta de un dato: título chico, cifra grande, detalle --- */
+.dato__titulo { color: var(--texto-2); font-size: var(--t-chico); }
+
+.dato__cifra {
+  margin-top: 4px;
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Etiqueta chica delante de una cifra ("Compra", "Venta") */
+.dato__cifra small {
+  margin-right: 6px;
+  color: var(--texto-2);
+  font-size: var(--t-chico);
+  font-weight: 400;
+}
+
+.dato__cifra span + span { margin-left: var(--e2); }
+
+.dato__detalle { margin-top: var(--e1); color: var(--texto-2); font-size: var(--t-chico); }
+
+/* --- Formulario: campos en fila que bajan de línea si no caben --- */
+.formulario {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--e2);
+}
+
+/* --- Lista de tarjetas en una columna (posiciones, resultados) --- */
+.pila {
+  display: grid;
+  gap: var(--e1);
+  max-width: 780px;
+}
+
+/* --- Posición: símbolo y variación arriba, detalle y botones abajo --- */
+.posicion {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--e1) var(--e2);
+  align-items: center;
+}
+
+.posicion__simbolo { font-size: 1.125rem; font-weight: 600; }
+.posicion__detalle { color: var(--texto-2); font-size: var(--t-chico); }
+
+.posicion__avisos {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--e1);
+}
+
+/* Etiqueta neutra (sin aviso) */
+.etiqueta--neutra {
+  border-color: var(--borde);
+  background: none;
+  color: var(--texto-2);
+  font-weight: 400;
+}
+
+/* Botón de texto, más discreto que el botón normal */
+.boton--texto {
+  min-height: 32px;
+  padding: 0 var(--e1);
+  border-color: transparent;
+  background: none;
+  font-size: var(--t-chico);
+}
+
+/* Resultado de un cálculo: cifra destacada dentro de una línea */
+.resultado { font-variant-numeric: tabular-nums; }
+.resultado strong { color: var(--texto); font-size: 1.125rem; }

@@ -11,13 +11,17 @@ import { crear, encabezado, aviso } from "./ui.js";
 import { pedir } from "./datos.js";
 import { graficas } from "../modulos/graficas/graficas.js";
 import { plazos } from "../modulos/plazos/plazos.js";
+import { reglas } from "../modulos/reglas/reglas.js";
+import { cambio } from "../modulos/cambio/cambio.js";
 
 // --- 1. Registro de módulos (el orden es el del menú) ---
 // Cada módulo cumple el contrato de docs/arquitectura.md, sección 7.
 // "proximamente: true" = aparece en el menú pero aún no está construido.
 const MODULOS = [
   graficas,
-  plazos
+  plazos,
+  reglas,
+  cambio
 ];
 
 // --- Datos públicos de un módulo ---
