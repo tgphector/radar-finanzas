@@ -49,37 +49,38 @@ Eres mi socio de desarrollo para construir Radar, una web personal de herramient
 Directo, breve, en español. Si mi idea complica el proyecto o choca con una decisión anterior, dímelo claro.
 
 ## Estado actual
-Actualizado: 11 nov 2026, cierre de la S1 de E2.
+Actualizado: 11 nov 2026, cierre de la S2 de E2.
 
-**En curso:** E2 · Plazos fijos. Sesión 1 de 3 hecha.
+**En curso:** E2 · Depósitos (plazo fijo y CTS). Sesiones 1 y 2 de 3 hechas.
 
 **Terminado:** E1 · Esqueleto + Mis gráficas (11 nov 2026).
 
 **Hecho en E2**
-- Archivo "Radar · Base de datos" en Google Sheets con las hojas `tasas_pf`, `fsd`, `fuentes` y `log`. Cargadas 33 entidades: Lima, soles, S/ 10 000 a 360 días, al 11 nov 2026.
-- `apps-script/Api.gs` y `apps-script/Utilidades.gs` publicados por Héctor como app web (`?recurso=tasas|fsd`, caché de 5 minutos, solo lectura).
-- `js/config.js` (dirección de la app web) y `js/datos.js` (pide un recurso; si falla, devuelve la última copia guardada en el navegador).
-- Comprobado: la página publicada logra leer la app web. Plan B descartado.
-- Plazos fijos sigue en el menú como "Próximamente": todavía no hay `modulos/plazos/plazos.js`.
+- Archivo "Radar · Base de datos" en Google Sheets con las hojas `tasas_pf`, `tasas_cts`, `fsd`, `fuentes` y `log`. Datos de la SBS al 11 nov 2026, todos de Lima: plazo fijo en soles (33 entidades), plazo fijo en dólares (32) y CTS (29). Monto del FSD cargado (vigente hasta el 30 nov 2026).
+- App web de Apps Script publicada por Héctor (`?recurso=tasas|cts|fsd`, caché de 5 minutos, solo lectura). Copia del código en `apps-script/`.
+- `js/config.js`, `js/datos.js` y `app.js` entregando los datos a los módulos.
+- Módulo "Depósitos" (`modulos/plazos/plazos.js`, dirección `#/plazos`): selectores Plazo fijo / CTS y Soles / Dólares, ranking por TREA con barra, fecha de los datos visible, nota de cobertura del FSD, ayudas "?" en TREA, CTS y FSD.
+- Revisado en la página publicada en laptop y celular. Fallas probadas en local: app web caída con y sin copia, hoja vacía, datos viejos, FSD sin monto.
 
-**Próxima sesión (S2 de E2)**
-1. Cargar en `tasas_pf` las 7 tablas que faltan con las capturas que pasará Héctor (soles: S/ 2 500, 5 000 y 20 000; dólares: las cuatro condiciones). Revisar qué montos publica la SBS en dólares.
-2. Pedir permiso de red para `fsd.org.pe`, llenar la hoja `fsd` con el monto de cobertura vigente y marcar la columna `fsd` de cada entidad.
-3. Proponer a Héctor el diseño del ranking (2-3 opciones) antes de construirlo.
-4. `modulos/plazos/plazos.js`: ranking por TREA con selector soles / dólares, fecha de los datos bien visible, etiqueta "Cubierto por el FSD", ayudas "?" en TREA y FSD. Registrar el módulo en `app.js` y quitar "Próximamente".
-5. `app.js` debe pedir los datos del módulo con `datos.js` y pasarlos a `render(contenedor, datos)` (contrato de la sección 7 de la arquitectura). Es un cambio en un archivo compartido: avisar.
+**Próxima sesión (S3 de E2, la última del entregable)**
+1. Simulador: el usuario escribe un monto y elige la moneda; se calcula el interés estimado a 360 días con la TREA publicada para 10 000 y el resultado se marca como "estimado". El monto no se guarda en ningún archivo (es dato personal); como mucho, en el navegador.
+2. Pruebas finales de E2 contra la definición de terminado (sección 14 de `docs/arquitectura.md`).
+3. Si toca por fecha: carga quincenal de las tres tablas (hacia el 26 nov 2026) y monto nuevo del FSD (desde diciembre).
 
-**Decisiones que debo preguntarle a Héctor al iniciar la S2**
-1. Cómo se ve el ranking: tabla propia o tarjetas; qué monto se muestra por defecto; cómo se muestra el tipo de entidad.
-2. Dónde y cómo se muestra la fecha de los datos (pidió que se vea claramente) y qué aviso sale cuando tengan más de 15 días.
-3. Cómo se muestra una entidad cuya cobertura del FSD no se pudo verificar.
+**Decisiones que debo preguntarle a Héctor al iniciar la S3**
+1. Cómo se ve el simulador: una columna más en el ranking ("ganarías aprox.") o un bloque aparte encima de la tabla.
+2. Si el simulador aplica también a CTS o solo a plazo fijo.
+3. Si el monto escrito se recuerda en el navegador o se borra al salir.
+4. Confirmar que la tabla de plazo fijo en dólares es por US$ 10 000.
 
 **Notas técnicas para retomar**
-- La SBS bloquea a los robots (Incapsula): no se puede leer desde el entorno de Claude ni desde Apps Script. No intentar saltarse la protección. Los datos entran por capturas de Héctor. **E3 está por replanificar** (alternativas en `docs/backlog.md`).
-- La SBS solo publica plazo fijo a 360 días, por región, con cuatro montos en soles; registra la TREA mínima aplicable. El simulador no tendrá selector de plazo: monto libre, tasa del tramo más cercano y resultado marcado como "estimado".
+- La SBS bloquea a los robots (Incapsula): no se puede leer desde el entorno de Claude ni desde Apps Script. No intentar saltarse la protección. Los datos entran por PDF o capturas que pasa Héctor en el chat; un PDF impreso desde la página de la SBS se lee bien con `pdftotext -layout`. **E3 está por replanificar** (alternativas en `docs/backlog.md`).
+- Radar mantiene solo tres tablas de la SBS (ver arriba). No pedir otros montos ni regiones.
 - El archivo de Sheets se edita con el conector de Google Sheets (buscarlo en Drive por su título; su identificador no se guarda en el repositorio). Después de cambiar la hoja, la app web tarda hasta 5 minutos en reflejarlo por la caché.
-- Si se cambia `Api.gs` o `Utilidades.gs`, Héctor debe pegar el código nuevo y crear una versión nueva de la implementación.
-- Entorno "radar-finanzas": permite TradingView, la página publicada, la SBS, `script.google.com` y `script.googleusercontent.com`. El sitio del FSD redirige a `fsd.org.pe`, que falta permitir.
+- Si se cambia `Api.gs` o `Utilidades.gs`, Héctor debe pegar el código nuevo y crear una versión nueva de la misma implementación (así la dirección `/exec` no cambia).
+- Esta sesión en la nube no puede controlar la laptop de Héctor ni su navegador.
+- Entorno "radar-finanzas": permite TradingView, la página publicada, la SBS, `fsd.org.pe`, `script.google.com` y `script.googleusercontent.com`.
+- En las pruebas con navegador automático, simular una parte de la app web y dejar pasar el resto puede hacer fallar un pedido real; conviene simular todo o nada.
 - TradingView cambia sus widgets sin aviso; si uno sale vacío en las pruebas, revisar primero si el entorno bloquea un sitio nuevo. Las capturas de página completa muestran vacíos los gráficos fuera de pantalla.
 - Commits con identidad genérica (`Claude <noreply@anthropic.com>`). Se trabaja en una rama y se pasa a `main` al cerrar la sesión.
 

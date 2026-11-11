@@ -9,7 +9,7 @@ Después de cada entregable: usarlo al menos 3 veces antes de dar por cerrado el
 | Entregable | Contenido | Sesiones | Estado |
 |---|---|---|---|
 | E1 | Esqueleto + Mis gráficas, publicado en GitHub Pages | 3 (S1 a S3) | **Terminado (11 nov 2026)** |
-| E2 | Plazos fijos (con `Api.gs` leyendo Sheets) | 3 (S1 a S3) | En curso · S1 hecha, sigue S2 |
+| E2 | Depósitos: plazo fijo y CTS (con `Api.gs` leyendo Sheets) | 3 (S1 a S3) | En curso · S1 y S2 hechas, sigue S3 |
 | E3 | Datos automáticos con Apps Script + PWA | 3 | Pendiente · **por replanificar**: la SBS bloquea la lectura automática |
 | Revisión | ¿Se usa? ¿Sigue el ritmo? ¿Qué sigue? | 1, al terminar E3 | — |
 | Fundamentales | Tabla propia con P/E, P/E forward y otras métricas (Apps Script + API + Sheets) | 3 | Tentativo · después de E3; su número y su orden frente a E4 se fijan en la revisión |
@@ -36,19 +36,20 @@ Cerrado el 11 nov 2026 con la definición de terminado completa (sección 14 de 
 - **Recortado en la S3:** edición de favoritos desde la interfaz; pasó a "Ideas sin compromiso". Los favoritos quedan fijos por defecto.
 - **Riesgo:** algún símbolo no disponible en los widgets gratuitos de TradingView.
 
-### E2 · Plazos fijos
+### E2 · Depósitos (plazo fijo y CTS)
+El módulo se llama "Depósitos" en el menú desde la S2; su dirección sigue siendo `#/plazos`.
 
 | Sesión | Qué se construye | Qué queda funcionando | Estado |
 |---|---|---|---|
 | S1 | Revisar qué publica la SBS, archivo "Radar · Base de datos" con `tasas_pf`, `fsd`, `fuentes` y `log`, `Api.gs` publicado como app web, `config.js` y `datos.js` | La página publicada logra leer las tasas de la hoja a través de la app web | **Hecha (11 nov 2026).** 33 entidades cargadas (Lima, soles, S/ 10 000 a 360 días). Lectura comprobada desde el origen de la página publicada. Plazos fijos sigue como "Próximamente" |
-| S2 | Cargar las 7 tablas que faltan. Ranking por TREA con selector soles / dólares, fecha de los datos bien visible, etiqueta "Cubierto por el FSD", ayudas "?" en TREA y FSD | #/plazos muestra el ranking real con fuente y fecha | Siguiente |
-| S3 | Simulador y pruebas (sin conexión, app web caída, hoja vacía, celular) | E2 terminado según la definición de terminado | Pendiente |
+| S2 | Cargar las tablas de la SBS, llenar el FSD, ranking por TREA con selector de moneda, fecha de los datos bien visible, nota de cobertura del FSD, ayudas "?". CTS se sumó en esta sesión | #/plazos muestra los rankings reales con fuente y fecha | **Hecha (11 nov 2026).** Módulo "Depósitos" con selector Plazo fijo / CTS y Soles / Dólares. Revisada en la página publicada |
+| S3 | Simulador y pruebas finales (sin conexión, app web caída, hoja vacía, celular) | E2 terminado según la definición de terminado | Siguiente |
 
-- **Qué publica la SBS** (aplicativo "Costo y Rendimiento de Productos Financieros", revisado el 11 nov 2026): por región, producto (plazo fijo en soles o en dólares) y condición, una tabla con entidad y TREA. En soles hay cuatro condiciones: S/ 2 500, 5 000, 10 000 y 20 000, todas a 360 días. La SBS registra la TREA mínima aplicable al producto. No publica TEA, tipo de entidad ni cobertura del FSD. Las condiciones en dólares están por ver.
-- **Datos que mantiene Radar:** Lima, soles y dólares, los cuatro montos (8 tablas). Carga manual quincenal a partir de capturas de Héctor. La fecha de los datos debe verse claramente en la página.
-- **Ranking:** por TREA a 360 días, con selector soles / dólares, fuente y fecha de la SBS.
-- **Simulador:** sin selector de plazo (la SBS solo publica 360 días). El usuario escribe cualquier monto, se usa la tasa del tramo de monto más cercano y el resultado sale marcado como "estimado". Moneda y tipo de entidad como filtros. Al simular, el nuevo ranking reemplaza al de arriba.
-- **Etiqueta "Cubierto por el FSD"** con el monto vigente de la fuente oficial. La columna `fsd` de cada entidad está vacía hasta verificarla con la lista del FSD.
+- **Qué publica la SBS** (aplicativo "Costo y Rendimiento de Productos Financieros", revisado el 11 nov 2026): por región y producto, una tabla por condición. Plazo fijo: entidad y TREA; en soles hay cuatro condiciones (S/ 2 500, 5 000, 10 000 y 20 000), todas a 360 días. CTS: entidad con TREA mínima y máxima en soles y en dólares. La SBS registra la TREA mínima aplicable. No publica TEA, tipo de entidad ni cobertura del FSD.
+- **Datos que mantiene Radar (decisión de Héctor en la S2): solo tres tablas de Lima.** Plazo fijo en soles por S/ 10 000 a 360 días (33 entidades), plazo fijo en dólares por US$ 10 000 a 360 días (32) y CTS (29). Carga manual quincenal a partir de los PDF o capturas que pasa Héctor. Los otros montos y regiones quedan fuera.
+- **Ranking (hecho):** tabla propia ordenada por TREA, con barra cian. En CTS se ordena por la TREA mínima y se muestra el rango mínimo – máximo. La fecha de los datos va en una etiqueta arriba y cambia a aviso si tienen más de 15 días.
+- **FSD (hecho):** una nota bajo la tabla con el monto vigente; solo se marca la entidad cuya cobertura no esté verificada. El monto cambia cada trimestre: toca actualizar la hoja `fsd` en diciembre, marzo, junio y setiembre.
+- **Simulador (S3):** sin selector de plazo. El usuario escribe cualquier monto y elige la moneda; como Radar mantiene un solo monto por moneda, se usa la tasa publicada para 10 000 y el resultado sale marcado como "estimado". Falta decidir si aplica también a CTS.
 - **Recortable:** filtro por tipo de entidad.
 - **Plan B descartado:** la página sí logra leer la app web; no hace falta el archivo JSON en el repositorio.
 

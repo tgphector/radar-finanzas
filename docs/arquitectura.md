@@ -1,4 +1,6 @@
-# Arquitectura de Radar (v7, 11 nov 2026 · cierre de la S1 de E2)
+# Arquitectura de Radar (v8, 11 nov 2026 · cierre de la S2 de E2)
+
+Cambios de v8: módulo "Depósitos" (plazo fijo y CTS) construido, hoja `tasas_cts` y recurso `cts`, `app.js` entrega los datos a los módulos, componentes nuevos.
 
 Cambios de v7: columnas reales de las hojas, `Api.gs` publicado, `config.js` y `datos.js` construidos, la SBS bloquea la lectura automática (E3 por replanificar).
 
@@ -52,9 +54,10 @@ Archivo: **"Radar · Base de datos"** (solo para Radar; nada personal adentro).
 
 | Hoja | Contenido | Quién escribe |
 |---|---|---|
-| `tasas_pf` | Último dato de tasas de plazo fijo: `entidad`, `tipo`, `moneda`, `plazo_dias`, `monto`, `trea`, `fsd`, `region`, `fecha_sbs`. Una fila por entidad y condición de la SBS | Carga manual (Claude con el conector de Sheets, a partir de capturas de Héctor) |
+| `tasas_pf` | Último dato de tasas de plazo fijo: `entidad`, `tipo`, `moneda`, `plazo_dias`, `monto`, `trea`, `fsd`, `region`, `fecha_sbs`. Una fila por entidad y condición de la SBS | Carga manual (Claude con el conector de Sheets, a partir de capturas o PDF de Héctor) |
+| `tasas_cts` | Último dato de tasas de CTS: `entidad`, `tipo`, `trea_min_pen`, `trea_max_pen`, `trea_min_usd`, `trea_max_usd`, `fsd`, `region`, `fecha_sbs`. Una fila por entidad | Carga manual, igual que `tasas_pf` |
 | `historial_tasas` | Una fila por entidad, plazo y día; se agrega, nunca se borra | Apps Script |
-| `fsd` | Monto de cobertura vigente, fecha y fuente | Héctor a mano (cambia pocas veces al año) |
+| `fsd` | Monto de cobertura vigente: `monto`, `moneda`, `vigente_desde`, `vigente_hasta`, `fuente`. Una fila; cambia cada trimestre | Carga manual desde fsd.org.pe |
 | `fuentes` | Una fila por recurso: `recurso`, `nombre`, `url`, `frecuencia`, `actualizado`, `estado`, `nota` | Quien cargue los datos |
 | `log` | Fecha, función, resultado (ok/error) y mensaje de cada ejecución | Apps Script |
 | `precios` (E4) | Precio de cierre por símbolo y fecha | Apps Script |
@@ -69,7 +72,7 @@ Proyecto vinculado al archivo de Sheets.
 
 ```
 Radar (Apps Script)
-├── Api.gs              # (E2) doGet(e): ?recurso=tasas|fsd|precios → JSON con fuente, fecha y estado
+├── Api.gs              # (E2 ✔) doGet(e): ?recurso=tasas|cts|fsd → JSON con fuente, fecha y estado (precios en E4)
 ├── ActualizarTasas.gs  # (E3, por replanificar) La SBS bloquea la lectura con UrlFetchApp
 ├── ActualizarPrecios.gs  # (E4) Trae precios de cierre de la API y escribe en precios
 ├── Utilidades.gs       # Leer/escribir hojas, registrar en log, caché
@@ -105,7 +108,7 @@ radar-finanzas/
 │   │   ├── graficas.js        #                                                         (E1 ✔)
 │   │   └── simbolos.json      # Símbolos por pestaña y favoritos por defecto            (E1 ✔)
 │   └── plazos/
-│       └── plazos.js          #                                                         (E2)
+│       └── plazos.js          # Módulo "Depósitos": plazo fijo y CTS                    (E2, S2 ✔)
 ├── docs/
 │   ├── arquitectura.md        # Este documento
 │   ├── backlog.md
@@ -141,6 +144,7 @@ Reglas:
 - Lee datos públicos solo con `datos.js` y datos personales solo con `memoria.js`.
 - Lo nuevo y compartido va a `ui.js` o `componentes.css` y se anota en decisiones.
 - Para registrar un módulo: se importa en `app.js` y se suma a la lista `MODULOS`.
+- `app.js` pide los recursos de `datos` con `datos.js` antes de dibujar y entrega un objeto `{ tasas: …, fsd: … }`. Si un recurso falla y no hay copia guardada, en su lugar llega `{ error }` (un `ErrorDatos` con su `motivo`) y el módulo decide qué mensaje mostrar. Mientras se piden los datos se ve "Cargando datos…".
 
 ## 8. Formato del JSON que entrega Apps Script
 
@@ -232,6 +236,16 @@ Reglas:
 - Un widget se crea solo cuando está por aparecer en pantalla (IntersectionObserver, con 200 px de anticipación). La tabla incluye solo los símbolos **activos** y solo se crea la de la pestaña abierta. El gráfico grande se crea al pulsar un chip o el botón "Ampliar".
 - Un widget por pestaña para la tabla, no uno por símbolo.
 - Meta: primera pantalla en menos de 2 segundos. La marca TradingView queda visible.
+
+## 11b. Módulo Depósitos (plazo fijo y CTS)
+
+- Archivo `modulos/plazos/plazos.js`; identificador `plazos`, dirección `#/plazos`, nombre en el menú "Depósitos". Pide los recursos `tasas`, `cts` y `fsd`.
+- **Datos:** tres tablas de la SBS, todas de Lima: plazo fijo en soles (S/ 10 000 a 360 días), plazo fijo en dólares (US$ 10 000 a 360 días) y CTS. Carga manual quincenal.
+- **Vista:** dos selectores (Plazo fijo / CTS y Soles / Dólares), recordados en `radar.plazos.producto` y `radar.plazos.moneda`. Debajo: etiqueta con la fecha de los datos, la condición de la SBS y el número de entidades; tabla propia (puesto, entidad con su tipo, TREA con barra cian); nota de cobertura del FSD; línea de fuente con enlace a la SBS.
+- **Orden:** de mayor a menor TREA; las entidades con la misma tasa comparten puesto. En CTS se ordena por la TREA mínima y la cifra muestra el rango mínimo – máximo. En celular, el rango se muestra sin barra.
+- **Fecha:** se toma de `fecha_sbs` de las filas mostradas. Con más de 15 días la etiqueta cambia a aviso.
+- **Fallas cubiertas:** app web caída con copia guardada (se muestra la copia con aviso), caída sin copia, sin conexión, hoja vacía o producto sin datos, FSD sin monto (no se afirma ninguna cifra), entidad sin cobertura verificada (se marca en su fila).
+- **Simulador:** pendiente (S3).
 
 ## 12. Operación
 - Revisar la hoja `log` una vez por semana durante el primer mes, luego una vez al mes.
