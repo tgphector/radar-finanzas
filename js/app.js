@@ -126,3 +126,13 @@ function mostrar() {
 dibujarMenu();
 window.addEventListener("hashchange", mostrar);
 mostrar();
+
+// --- 4. Service worker (PWA) ---
+// Registra sw.js para que Radar se pueda instalar como app y abra sin
+// conexión con la última copia. Si el navegador no lo soporta o falla,
+// Radar funciona igual que siempre.
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch((error) => console.warn("No se pudo registrar el service worker", error));
+  });
+}

@@ -8,6 +8,12 @@
   <meta name="theme-color" content="#0E0F11">
   <title>Radar</title>
 
+  <!-- PWA: el manifiesto le dice al navegador cómo instalar Radar como app
+       (nombre, ícono, colores). El ícono "apple-touch" es el del iPhone. -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icono-192.png">
+  <link rel="apple-touch-icon" href="icons/icono-180.png">
+
   <!-- Estilos: primero los valores (tokens), luego el esqueleto y las piezas -->
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/base.css">
@@ -51,7 +57,7 @@
     <!-- PIE: aviso fijo en todas las pantallas (regla de producto) -->
     <footer class="pie">
       <p>Herramienta informativa y educativa. No es asesoría financiera. Tasas referenciales; confirma con cada entidad.</p>
-      <p>Gráficos y cotizaciones: <a href="https://www.tradingview.com/" target="_blank" rel="noopener">TradingView</a>.</p>
+      <p>Gráficos y cotizaciones: <a href="https://www.tradingview.com/" target="_blank" rel="noopener">TradingView</a>. Tasas de depósitos: SBS. Cobertura de depósitos: FSD.</p>
     </footer>
 
   </div>
