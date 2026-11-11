@@ -49,34 +49,36 @@ Eres mi socio de desarrollo para construir Radar, una web personal de herramient
 Directo, breve, en español. Si mi idea complica el proyecto o choca con una decisión anterior, dímelo claro.
 
 ## Estado actual
-Actualizado: 11 nov 2026, cierre de la S1 de E1 y limpieza de datos personales del repositorio.
+Actualizado: 11 nov 2026, cierre de la S2 de E1.
 
-**En curso:** E1 · Esqueleto + Mis gráficas. Sesión 1 de 3 hecha.
+**En curso:** E1 · Esqueleto + Mis gráficas. Sesiones 1 y 2 de 3 hechas.
 
 **Hecho**
 - Repositorio y GitHub Pages activos. El repositorio se recreó el 11 nov 2026 con un historial limpio.
 - Esqueleto: menú lateral (laptop) y barra inferior (celular), router (`#/graficas`, `#/plazos`), design system, pie con aviso, `memoria.js`, `ui.js`.
-- Mis gráficas: 6 tarjetas de favoritos con mini gráfico de TradingView (último año), carga diferida, línea de fuente y hora, ayuda "?" en ETF.
+- Mis gráficas · Favoritos: 6 tarjetas con mini gráfico de TradingView (último año), carga diferida, línea de fuente y hora, ayuda "?" en ETF.
+- Mis gráficas · Todos los símbolos: pestañas (Populares, ETFs, Otros, Referencias), tabla de cotizaciones por pestaña con los símbolos activos, chips que abren un gráfico simple de 1 año y botón "Editar" con un interruptor por símbolo, guardado en el navegador.
+- Los 45 símbolos de `simbolos.json` probados en TradingView: todos cargan (QBTS corregido a `NASDAQ:QBTS`). Ninguno quedó "sin datos".
+- Componentes compartidos nuevos en `ui.js` y `componentes.css`: botón, pestañas, chip, interruptor.
 - Plazos fijos aparece en el menú como "Próximamente".
-- `simbolos.json` con los 45 símbolos en 4 pestañas.
-- Revisado en la página publicada en laptop (1366 px) y celular; mensajes de falla probados (sin `simbolos.json`, localStorage bloqueado, TradingView no disponible).
+- Revisado en la página publicada (laptop y celular). Fallas probadas: sin conexión, localStorage bloqueado, pestaña con todo apagado, símbolo marcado "sin datos".
 
-**Próxima sesión (S2 de E1)**
-1. Probar en TradingView los 39 símbolos que no son favoritos y corregir `simbolos.json` (más riesgo: PRYMY, USD/PEN, IBIT, INGM, ITA).
-2. Tabla por pestañas (Populares, ETFs, Otros, Referencias): un widget de cotizaciones por pestaña con los símbolos activos. Verificar si trae el rango del día.
-3. Chips de símbolos y botón "Editar" con un interruptor por símbolo, guardado con `memoria.js`.
-4. Carga diferida de la tabla. Componentes nuevos (pestañas, interruptor, chip) van a `componentes.css` y `ui.js`.
+**Próxima sesión (S3 de E1, la última del entregable)**
+1. Gráfico grande con selector 1d / 5d / 1m / 1a / 5a. Reemplaza al gráfico simple que hoy abre el chip (`pintarGrafico()` en `graficas.js`).
+2. Pruebas finales de E1 contra la definición de terminado (sección 14 de `docs/arquitectura.md`): laptop, celular, sin conexión, localStorage bloqueado.
+3. Si sobra tiempo (recortable): editar favoritos desde la interfaz.
 
-**Después (S3 de E1):** gráfico grande con selector 1d / 5d / 1m / 1a / 5a y pruebas finales.
-
-**Decisiones que debo preguntarle a Héctor al iniciar la S2**
-1. Nombre de la pestaña "ETFs": quedó así, sin subgrupos, por la regla de privacidad. ¿Se queda o prefiere otro nombre?
-2. BAP: sigue en favoritos. En `simbolos.json` lleva un nombre genérico, pero el widget de TradingView muestra el nombre real de la empresa. ¿Se queda en favoritos, pasa solo a "Otros" o sale de la lista?
-3. Si algún símbolo no carga en TradingView: corregir la bolsa, marcarlo "sin datos" o quitarlo.
+**Decisiones que debo preguntarle a Héctor al iniciar la S3**
+1. Qué widget usar para el gráfico grande: uno liviano con periodos propios o el gráfico avanzado de TradingView. Llevar 2-3 opciones probadas, con su peso y cómo se ven en celular.
+2. Dónde se abre el gráfico grande: debajo de los chips (como hoy) o en un panel que tape la pantalla en celular.
+3. Si los favoritos también abren el gráfico grande al pulsarlos.
 
 **Notas técnicas para retomar**
-- La tabla de la S2 usa un widget de cotizaciones de TradingView en formato iframe, igual que el mini gráfico. Antes de escribirlo, confirma en la documentación de widgets de TradingView el nombre del script y sus opciones; no lo des por sabido.
-- `simbolos.json` ya tiene los 45 símbolos por pestaña; la bolsa de cada uno (`tv`) está puesta de memoria y solo se comprobaron los 6 favoritos.
-- Los iframes de TradingView no se pueden leer desde el código (son de otro sitio): que un símbolo carga se comprueba mirando la página.
+- Antes de escribir el gráfico grande, confirma en la documentación de widgets de TradingView el nombre del script y sus opciones (en especial cómo se fija el periodo); no lo des por sabido.
+- `cargarWidget()` en `graficas.js` sirve para cualquier widget en formato iframe: recibe el script y la configuración.
+- Los iframes de TradingView no se pueden leer desde el código de la página. El widget de cotizaciones omite sin avisar un símbolo inválido: si uno deja de cargar, se marca `"sinDatos": true` en `simbolos.json` y se anota en Pendientes de `docs/decisiones.md`.
+- Memoria del módulo: `radar.graficas.apagados`, `radar.graficas.pestana`, `radar.graficas.favoritos`.
+- Entorno en la nube de Claude Code: el entorno "radar-finanzas" permite llegar a TradingView y a la página publicada, así que los widgets se pueden probar con un navegador sin interfaz. Las capturas de página completa muestran vacíos los gráficos fuera de pantalla; hay que capturar la zona visible.
+- Commits con identidad genérica (`Claude <noreply@anthropic.com>`). Se trabaja en una rama y se pasa a `main` al cerrar la sesión.
 
 **Pendientes abiertos:** ver también la sección "Pendientes" de `docs/decisiones.md`.

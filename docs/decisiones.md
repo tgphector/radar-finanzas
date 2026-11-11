@@ -4,6 +4,18 @@ Una línea por decisión. Lo más nuevo arriba.
 
 | Fecha | Decisión | Motivo |
 |---|---|---|
+| 11 nov 2026 | Los favoritos son independientes del botón "Editar": apagar un símbolo lo quita de la tabla y de los chips, pero su tarjeta de favorito sigue visible | Sería raro que un favorito desaparezca por un interruptor de la tabla. Ajusta la regla "un widget solo se crea si el símbolo está activo": aplica a la tabla, no a los favoritos |
+| 11 nov 2026 | La sección de la tabla se llama "Todos los símbolos" | Se distingue de "Favoritos" sin usar jerga |
+| 11 nov 2026 | Un símbolo que no carga en TradingView lleva `"sinDatos": true` en `simbolos.json`: sale de la tabla y se ve como chip gris "Sin datos en TradingView". Cada caso se anota en Pendientes para que Héctor decida si lo quita | El widget omite un símbolo inválido sin avisar y la página no puede leer el iframe, así que la marca tiene que ser manual |
+| 11 nov 2026 | Los 45 símbolos se probaron en el widget de cotizaciones y todos cargan. QBTS se corrigió de NYSE a `NASDAQ:QBTS`. Ninguno quedó "sin datos" | Cierra el pendiente de verificación de la S1 |
+| 11 nov 2026 | Tabla: widget "Market Quotes" (`embed-widget-market-quotes.js`), con columnas valor, cambio, cambio %, apertura, máximo, mínimo y anterior. El rango del día queda cubierto con máximo y mínimo | Confirmado en la documentación de TradingView y en la página; no hizo falta recortar el rango del día |
+| 11 nov 2026 | Clic en un chip: abre debajo un gráfico simple de 1 año (el mini gráfico de la S1, más alto). En la S3 lo reemplaza el gráfico grande con selector | Que el chip ya sirva en la S2 sin adelantar la S3 |
+| 11 nov 2026 | "Editar" vive dentro de cada pestaña: los chips se vuelven interruptores y el botón pasa a "Listo"; la tabla se rehace al pulsar "Listo" | Menos código y mejor en celular que un panel con los 45 |
+| 11 nov 2026 | La primera vez los 45 símbolos están activos. En el navegador se guardan solo los apagados (`radar.graficas.apagados`) y la última pestaña (`radar.graficas.pestana`) | Los amigos ven la tabla completa; un símbolo nuevo nace activo |
+| 11 nov 2026 | En celular la tabla se desliza de lado dentro de su tarjeta (ancho mínimo de 680 px) | Ocho columnas no caben en 360 px; así se conserva el precio |
+| 11 nov 2026 | Componentes nuevos compartidos: botón, pestañas, chip, interruptor, barra, nota y tarjeta de tabla (`ui.js` y `componentes.css`) | Regla de arquitectura: lo nuevo y compartido se anota |
+| 11 nov 2026 | La pestaña se queda como "ETFs" y BAP sigue en favoritos | Decisión de Héctor al iniciar la S2 |
+| 11 nov 2026 | Los commits salen con una identidad genérica (`Claude <noreply@anthropic.com>`), nunca con un correo personal. Claude trabaja en una rama y pasa los cambios a `main` al cerrar la sesión | El repositorio es público |
 | 11 nov 2026 | Repositorio `tgphector/radar-finanzas` borrado y creado de nuevo con un único commit limpio; GitHub Pages reactivado sobre `main`, carpeta raíz | El force push no garantiza que GitHub elimine los commits anteriores; recrearlo sí |
 | 11 nov 2026 | El repositorio no guarda datos personales, laborales, académicos ni financieros de Héctor. La pestaña de ETFs se llama "ETFs", sin subgrupos. Historial de Git reescrito en un solo commit limpio | El repositorio y la página son públicos |
 | 10 nov 2026 | Se sigue construyendo en Claude Code. Los documentos viven en el repositorio (`docs/arquitectura.md`, `docs/backlog.md`, `docs/decisiones.md`, `docs/investigacion.md`) y las instrucciones en `CLAUDE.md`. En el cierre de cada sesión Claude actualiza esos archivos y los sube | Una sola copia de los documentos, junto al código; ya no se copian textos a mano |
@@ -43,8 +55,5 @@ Una línea por decisión. Lo más nuevo arriba.
 | 10 nov 2026 | Construcción por entregables sobre un esqueleto mínimo | Práctica validada (walking skeleton, Shape Up) |
 
 ## Pendientes
-- Confirmar con Héctor el nombre de la pestaña "ETFs" (S2).
-- Decidir si BAP sigue en favoritos: el widget muestra el nombre real de la empresa (S2).
-- Verificar en la S2 los 39 símbolos que aún no se han visto en TradingView (más riesgo: PRYMY, USD/PEN, IBIT, INGM, ITA).
-- Verificar en la S2 si el widget de cotizaciones trae el rango del día.
+- Símbolos "sin datos en TradingView" por decidir: ninguno (11 nov 2026).
 - Confirmar si la SBS permite leer las tasas con un script (E2/E3).

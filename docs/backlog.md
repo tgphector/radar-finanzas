@@ -8,7 +8,7 @@ Después de cada entregable: usarlo al menos 3 veces antes de dar por cerrado el
 
 | Entregable | Contenido | Sesiones | Estado |
 |---|---|---|---|
-| E1 | Esqueleto + Mis gráficas, publicado en GitHub Pages | 3 (S1 a S3) | En curso · S1 hecha, sigue S2 |
+| E1 | Esqueleto + Mis gráficas, publicado en GitHub Pages | 3 (S1 a S3) | En curso · S1 y S2 hechas, sigue S3 |
 | E2 | Plazos fijos (con `Api.gs` leyendo Sheets) | 3 | Pendiente |
 | E3 | Datos automáticos con Apps Script + PWA | 3 | Pendiente |
 | Revisión | ¿Se usa? ¿Sigue el ritmo? ¿Qué sigue? | 1, al terminar E3 | — |
@@ -25,11 +25,11 @@ Después de cada entregable: usarlo al menos 3 veces antes de dar por cerrado el
 | Sesión | Qué se construye | Qué queda funcionando | Estado |
 |---|---|---|---|
 | S1 | Repositorio `tgphector/radar-finanzas` con Pages activo. Esqueleto: menú lateral (laptop) y barra inferior (celular), router, design system, pie con aviso, `memoria.js`, `ui.js`, `simbolos.json`. 6 tarjetas de favoritos con mini gráfico | Enlace público con menú, #/graficas con los 6 favoritos, #/plazos con "Próximamente", aviso en el pie | **Hecha (10 nov 2026).** Revisada en la página publicada en laptop y celular. Quedó para S2: probar los otros 39 símbolos |
-| S2 | **Primero:** probar los 39 símbolos restantes en TradingView y corregir `simbolos.json`. Luego: tabla por pestañas (Populares, ETFs, Otros, Referencias), chips de símbolos, botón "Editar" con interruptor por símbolo guardado en el navegador, carga diferida | Activar y desactivar símbolos y que se recuerde al volver; solo cargan los activos y visibles | Siguiente |
-| S3 | Gráfico grande con selector 1d / 5d / 1m / 1a / 5a, fuente y hora en cada bloque, pruebas (sin conexión, localStorage bloqueado, celular) | E1 terminado según la definición de terminado | Pendiente |
+| S2 | **Primero:** probar los 39 símbolos restantes en TradingView y corregir `simbolos.json`. Luego: tabla por pestañas (Populares, ETFs, Otros, Referencias), chips de símbolos, botón "Editar" con interruptor por símbolo guardado en el navegador, carga diferida | Activar y desactivar símbolos y que se recuerde al volver; solo cargan los activos y visibles | **Hecha (11 nov 2026).** Los 45 símbolos cargan (QBTS corregido a NASDAQ). El clic en un chip abre un gráfico simple de 1 año. Revisada en la página publicada |
+| S3 | Gráfico grande con selector 1d / 5d / 1m / 1a / 5a (reemplaza al gráfico simple que hoy abre el chip), fuente y hora en cada bloque, pruebas (sin conexión, localStorage bloqueado, celular) | E1 terminado según la definición de terminado | Siguiente |
 
 - **Lista de símbolos y diseño de la vista:** sección 11 de `docs/arquitectura.md`.
-- **Recortable si no cabe:** edición de favoritos desde la interfaz (se dejan fijos por defecto); columna "rango del día" si el widget no la trae.
+- **Recortable si no cabe:** edición de favoritos desde la interfaz (se dejan fijos por defecto).
 - **Riesgo:** algún símbolo no disponible en los widgets gratuitos de TradingView.
 
 ### E2 · Plazos fijos

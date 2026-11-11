@@ -1,4 +1,6 @@
-# Arquitectura de Radar (v4, 10 nov 2026 · cierre de la S1 de E1)
+# Arquitectura de Radar (v5, 11 nov 2026 · cierre de la S2 de E1)
+
+Cambios de v5: tabla por pestañas, chips y "Editar" construidos; los 45 símbolos verificados; marca `sinDatos`; claves de memoria de Mis gráficas; componentes nuevos.
 
 Cambios de v4: Radar vive en GitHub Pages desde E1 (ya no hay etapa en artifact), Claude sube los cambios al repositorio, lista de símbolos y pestañas actualizadas, diseño de la tabla de Mis gráficas definido, `Api.gs` adelantado a E2, formato de widget elegido y documentos dentro del repositorio (`docs/`).
 
@@ -86,7 +88,7 @@ radar-finanzas/
 ├── css/
 │   ├── tokens.css             # Design system                                           (E1 ✔)
 │   ├── base.css               # Estilos generales y responsive                          (E1 ✔)
-│   └── componentes.css        # Tarjeta, cuadrícula, fuente, aviso, ayuda "?"           (E1 ✔; pestañas, interruptor y chips en S2)
+│   └── componentes.css        # Tarjeta, cuadrícula, fuente, aviso, ayuda "?"           (E1 ✔; botón, pestañas, chip e interruptor desde S2)
 ├── js/
 │   ├── app.js                 # Arranque, router (#/graficas, #/plazos), registro       (E1 ✔)
 │   ├── memoria.js             # Capa de almacenamiento personal (sección 9)             (E1 ✔)
@@ -95,7 +97,7 @@ radar-finanzas/
 │   └── datos.js               # Pide el JSON, maneja errores y muestra la fecha         (E2)
 ├── modulos/
 │   ├── graficas/
-│   │   ├── graficas.js        #                                                         (E1, S1 ✔)
+│   │   ├── graficas.js        #                                                         (E1, S1 y S2 ✔)
 │   │   └── simbolos.json      # Símbolos por pestaña y favoritos por defecto            (E1 ✔)
 │   └── plazos/
 │       └── plazos.js          #                                                         (E2)
@@ -194,24 +196,29 @@ Reglas:
 - Favoritos por defecto: IVV, IVW, NVDA, EPU, IEMG, BAP.
 - Fuera de la lista por decisión: QQQ, DIA, SHY, IEF, TLT, HERE.
 - `modulos/graficas/simbolos.json` es la copia que usa el código; esta tabla es la referencia. Cada símbolo lleva su bolsa en formato TradingView (`NASDAQ:NVDA`, `AMEX:IVV`).
-- Verificado en la página publicada (10 nov): los 6 favoritos cargan. **Por verificar al inicio de la S2:** los otros 39 (más riesgo: PRYMY, USD/PEN, IBIT, INGM, ITA). El que no se pueda mostrar se corrige de bolsa, se marca "sin datos en TradingView" o sale de la lista, con aviso a Héctor.
+- Verificado el 11 nov 2026: los 45 cargan en el widget de cotizaciones (QBTS va con `NASDAQ:QBTS`).
+- Un símbolo que deje de cargar se marca con `"sinDatos": true` en `simbolos.json`: sale de la tabla y se ve como chip gris "Sin datos en TradingView". El widget omite un símbolo inválido sin avisar, por eso la marca es manual; se anota en Pendientes de `docs/decisiones.md`.
 
 ### Vista
 - **Favoritos (hecho en S1):** 6 tarjetas con mini gráfico arriba (widget "Mini Chart", último año, línea en cian).
-- **Tabla por pestaña (S2):** un widget de cotizaciones de TradingView por pestaña, solo con los símbolos activos. Columnas buscadas: símbolo, precio, variación %, rango del día (si el widget no trae el rango, ese dato se ve en el gráfico grande).
-- **Chips de símbolos (S2)** debajo de la tabla (elementos propios): clic en un chip abre el gráfico grande. Botón "Editar" muestra un interruptor por símbolo. Motivo: el clic dentro de un widget lleva a tradingview.com y la página no lo puede capturar.
-- **Gráfico grande (S3)** con selector 1d / 5d / 1m / 1a / 5a.
+- **Todos los símbolos (hecho en S2):** pestañas (Populares, ETFs, Otros, Referencias) y un widget de cotizaciones por pestaña, solo con los símbolos activos. Columnas del widget: valor, cambio, cambio %, apertura, máximo, mínimo y anterior. Se recuerda la última pestaña abierta. En celular la tabla se desliza de lado dentro de su tarjeta.
+- **Chips de símbolos (hecho en S2)** debajo de la tabla (elementos propios): clic en un chip abre debajo un gráfico simple de 1 año con botón "Cerrar". Motivo: el clic dentro de un widget lleva a tradingview.com y la página no lo puede capturar.
+- **Editar (hecho en S2):** dentro de cada pestaña, los chips se vuelven interruptores y el botón pasa a "Listo"; al pulsarlo, la tabla se rehace con los activos. Los favoritos no dependen de estos interruptores.
+- **Memoria del módulo:** `radar.graficas.apagados` (lista de símbolos apagados; los demás están activos), `radar.graficas.pestana` (última pestaña) y `radar.graficas.favoritos` (aún sin interfaz).
+- **Gráfico grande (S3)** con selector 1d / 5d / 1m / 1a / 5a; reemplaza al gráfico simple que abre el chip.
 - Cada bloque muestra "Fuente: TradingView · cargado <fecha y hora>"; los precios pueden tener retraso según la bolsa.
 
 ### Widgets de TradingView
 - **Formato:** iframe. Se crea un `div.tradingview-widget-container` con un `<script>` cuyo `src` es el del widget y cuyo contenido es la configuración en JSON.
 - Mini Chart: `https://s3.tradingview.com/external-embedding/embed-widget-mini-symbol-overview.js` con `colorTheme: "dark"`, `isTransparent: true`, `locale: "es"`, `dateRange: "12M"`.
+- Tabla (Market Quotes): `https://s3.tradingview.com/external-embedding/embed-widget-market-quotes.js` con `symbolsGroups` (un grupo por pestaña; cada símbolo con `name` y `displayName`), `colorTheme: "dark"`, `isTransparent: true`, `locale: "es"`. El alto de la tarjeta se calcula por filas: 54 px de encabezado + 36 px por símbolo + 40 px para la marca.
+- `cargarWidget()` en `graficas.js` crea cualquiera de los dos widgets; solo cambian el script y la configuración.
 - El texto "Cargando…" se quita cuando el iframe termina de cargar (MutationObserver + evento `load`).
 - Fallas cubiertas: sin conexión (reintenta al volver el internet), script bloqueado (mensaje en la tarjeta), `simbolos.json` no disponible (aviso en el módulo).
 
 ### Rendimiento
 - Ningún widget se carga al abrir la página.
-- Un widget se crea solo si el símbolo está **activo** en el filtro **y** aparece en pantalla (IntersectionObserver, con 200 px de anticipación).
+- Un widget se crea solo cuando está por aparecer en pantalla (IntersectionObserver, con 200 px de anticipación). La tabla incluye solo los símbolos **activos** y solo se crea la de la pestaña abierta. El gráfico de un chip se crea al pulsarlo.
 - Un widget por pestaña para la tabla, no uno por símbolo.
 - Meta: primera pantalla en menos de 2 segundos. La marca TradingView queda visible.
 
