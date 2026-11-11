@@ -8,4 +8,4 @@
 // avisan que todavía no están conectados.
 // ============================================================
 
-export const URL_API = "";
+export const URL_API = "https://script.google.com/macros/s/AKfycbxfrNn6wi5-v2jT_8jnybK6g2hdnDI7aGkWwiHKiLoNgYy0SZ8aQKZN3KQV3_as6gRzHw/exec";
