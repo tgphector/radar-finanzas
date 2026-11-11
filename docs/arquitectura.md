@@ -1,4 +1,6 @@
-# Arquitectura de Radar (v8, 11 nov 2026 · cierre de la S2 de E2)
+# Arquitectura de Radar (v9, 11 nov 2026 · cierre de E2 y E3 replanificado)
+
+Cambios de v9: simulador de plazo fijo, hoja `historial_tasas`, procedimiento de carga quincenal, PWA (`manifest.json`, `sw.js`, íconos).
 
 Cambios de v8: módulo "Depósitos" (plazo fijo y CTS) construido, hoja `tasas_cts` y recurso `cts`, `app.js` entrega los datos a los módulos, componentes nuevos.
 
@@ -56,7 +58,7 @@ Archivo: **"Radar · Base de datos"** (solo para Radar; nada personal adentro).
 |---|---|---|
 | `tasas_pf` | Último dato de tasas de plazo fijo: `entidad`, `tipo`, `moneda`, `plazo_dias`, `monto`, `trea`, `fsd`, `region`, `fecha_sbs`. Una fila por entidad y condición de la SBS | Carga manual (Claude con el conector de Sheets, a partir de capturas o PDF de Héctor) |
 | `tasas_cts` | Último dato de tasas de CTS: `entidad`, `tipo`, `trea_min_pen`, `trea_max_pen`, `trea_min_usd`, `trea_max_usd`, `fsd`, `region`, `fecha_sbs`. Una fila por entidad | Carga manual, igual que `tasas_pf` |
-| `historial_tasas` | Una fila por entidad, plazo y día; se agrega, nunca se borra | Apps Script |
+| `historial_tasas` | Copia fechada de las tres tablas en cada carga: `producto` (plazo_fijo o cts), `entidad`, `tipo`, `moneda`, `plazo_dias`, `monto`, `trea`, `fsd`, `region`, `fecha_sbs`, `trea_max` (solo CTS). Se agrega, nunca se borra. La app web no la entrega todavía | Quien cargue los datos |
 | `fsd` | Monto de cobertura vigente: `monto`, `moneda`, `vigente_desde`, `vigente_hasta`, `fuente`. Una fila; cambia cada trimestre | Carga manual desde fsd.org.pe |
 | `fuentes` | Una fila por recurso: `recurso`, `nombre`, `url`, `frecuencia`, `actualizado`, `estado`, `nota` | Quien cargue los datos |
 | `log` | Fecha, función, resultado (ok/error) y mensaje de cada ejecución | Apps Script |
@@ -114,8 +116,9 @@ radar-finanzas/
 │   ├── backlog.md
 │   ├── decisiones.md
 │   └── investigacion.md       # Contexto histórico
-├── manifest.json              # Instalar Radar como app (PWA)                           (E3)
-├── sw.js                      # Carga rápida y uso básico sin conexión                  (E3)
+├── manifest.json              # Instalar Radar como app (PWA)                           (E3 ✔)
+├── sw.js                      # Service worker: abre sin conexión con la última copia   (E3 ✔)
+├── icons/                     # Íconos de la app (192, 512, 512 maskable, 180 para iPhone) (E3 ✔)
 └── apps-script/               # Copia de respaldo: Api.gs y Utilidades.gs               (E2 ✔)
 ```
 
@@ -245,12 +248,15 @@ Reglas:
 - **Orden:** de mayor a menor TREA; las entidades con la misma tasa comparten puesto. En CTS se ordena por la TREA mínima y la cifra muestra el rango mínimo – máximo. En celular, el rango se muestra sin barra.
 - **Fecha:** se toma de `fecha_sbs` de las filas mostradas. Con más de 15 días la etiqueta cambia a aviso.
 - **Fallas cubiertas:** app web caída con copia guardada (se muestra la copia con aviso), caída sin copia, sin conexión, hoja vacía o producto sin datos, FSD sin monto (no se afirma ninguna cifra), entidad sin cobertura verificada (se marca en su fila).
-- **Simulador:** pendiente (S3).
+- **Simulador (solo plazo fijo):** un campo de monto encima de la tabla. Con un monto válido la tabla suma la columna "Interés estimado" = monto × TREA / 100 (plazo de 360 días), calculada con la tasa que la SBS publica para 10 000. Una nota aclara que es un estimado y otra avisa si el monto en soles supera la cobertura del FSD. El monto se recuerda en `radar.plazos.monto` (solo en el navegador) y se quita con "Borrar". En celular la tabla simulada oculta el puesto y la barra para que entren las cifras.
 
 ## 12. Operación
+- **Carga quincenal de tasas (manual).** La SBS no se puede leer con un script. Pasos: (1) Héctor imprime a PDF, desde el aplicativo de la SBS, las tres tablas de Lima (plazo fijo en soles por S/ 10 000 a 360 días, plazo fijo en dólares por US$ 10 000 a 360 días y CTS) y las pasa en el chat; (2) Claude lee los PDF (`pdftotext -layout`), compara el número de entidades con la carga anterior y reemplaza `tasas_pf` y `tasas_cts` con el conector de Sheets; (3) copia las filas nuevas al final de `historial_tasas`; (4) actualiza `actualizado` en `fuentes`; (5) revisa la página publicada pasados 5 minutos (caché de la app web). Si un PDF viene incompleto, no se reemplaza nada.
+- **Monto del FSD:** cambia cada trimestre (diciembre, marzo, junio, setiembre). Se actualiza la hoja `fsd` desde fsd.org.pe/cobertura.
+- **PWA.** `sw.js` guarda los archivos propios de Radar y responde "red primero, copia si falla". Al agregar un archivo nuevo a Radar conviene sumarlo a la lista `BASE` de `sw.js`; si se quiere forzar la limpieza de copias viejas, se cambia el nombre `CACHE` (`radar-v1` → `radar-v2`). Los widgets de TradingView y la app web no pasan por el service worker.
 - Revisar la hoja `log` una vez por semana durante el primer mes, luego una vez al mes.
-- Apps Script puede enviar un correo si una actualización falla dos días seguidos (E3, recortable).
-- Contador de visitas sin cookies para medir si los amigos vuelven (E3).
+- Aviso de datos viejos: la etiqueta de fecha de Depósitos cambia a aviso pasados 15 días (reemplaza al correo de alerta).
+- Contador de visitas: sin construir; por decidir en la revisión (opciones en `docs/backlog.md`, E3).
 - Entorno: laptop personal. Se construye con Claude Code sobre este repositorio; Apps Script se usa desde el navegador.
 - Costo objetivo: S/ 0.
 

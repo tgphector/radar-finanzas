@@ -4,6 +4,15 @@ Una línea por decisión. Lo más nuevo arriba.
 
 | Fecha | Decisión | Motivo |
 |---|---|---|
+| 11 nov 2026 | **E2 terminado** (falta solo que Héctor confirme el uso del simulador). **E3 replanificado y construido** en lo posible: carga manual quincenal, hoja `historial_tasas`, aviso de datos viejos y PWA. Sigue la revisión | Héctor pidió avanzar todos los entregables posibles en una sola tanda; las decisiones de diseño de esta tanda las tomó Claude con la opción recomendada y quedan aquí para revisarlas |
+| 11 nov 2026 | Simulador: solo para plazo fijo; suma a la tabla la columna "Interés estimado" (monto × TREA a 360 días); nota de "estimado"; aviso si el monto en soles supera la cobertura del FSD. No aplica a CTS | Decidido por Claude. En CTS el saldo cambia con cada depósito del empleador y un cálculo simple engañaría |
+| 11 nov 2026 | El monto del simulador se recuerda en el navegador (`radar.plazos.monto`) y tiene botón "Borrar". No se guarda en ningún archivo ni viaja a la hoja | Decidido por Claude. Es un dato personal: regla de producto |
+| 11 nov 2026 | E3 sin lectura automática de la SBS. Se descartan GitHub Actions y cualquier forma de saltarse la protección. La actualización es la carga manual quincenal por PDF | La SBS rechaza a los robots; lo manual ya funciona y son solo tres tablas |
+| 11 nov 2026 | En cada carga se copian las tres tablas a la hoja `historial_tasas` (`producto`, `entidad`, `tipo`, `moneda`, `plazo_dias`, `monto`, `trea`, `fsd`, `region`, `fecha_sbs`, `trea_max`), que nunca se borra. La app web no la entrega todavía | Guardar la evolución de las tasas desde ya; mostrarla es una idea sin compromiso |
+| 11 nov 2026 | El correo de alerta de E3 se reemplaza por el aviso en la página cuando los datos tienen más de 15 días | Sin actualización automática no hay ejecución que vigilar |
+| 11 nov 2026 | PWA: service worker con "red primero y copia si falla", solo para archivos propios de Radar. Los widgets de TradingView y la app web no pasan por él | Radar siempre muestra la versión más nueva cuando hay internet y abre sin él; los datos ya guardan su propia copia en `datos.js` |
+| 11 nov 2026 | El contador de visitas no se construye todavía: queda por decidir en la revisión | Exige escribir en algún lado (servicio externo con cuenta o una puerta de escritura pública); es decisión de Héctor |
+| 11 nov 2026 | Componentes nuevos compartidos: campo de monto (`ui.js` y `componentes.css`). El pie nombra las fuentes de los depósitos (SBS y FSD) | Regla de arquitectura: lo nuevo y compartido se anota |
 | 11 nov 2026 | **Radar trabaja solo con tres tablas de la SBS, todas de Lima:** plazo fijo en soles por S/ 10 000 a 360 días, plazo fijo en dólares por US$ 10 000 a 360 días y CTS. Reemplaza a "8 tablas con los cuatro montos" | Decisión de Héctor: menos trabajo manual en cada carga quincenal |
 | 11 nov 2026 | CTS entra a E2. El módulo pasa a llamarse "Depósitos" en el menú y en el título, con un selector "Plazo fijo / CTS" y otro "Soles / Dólares". Su identificador y su dirección siguen siendo `plazos` y `#/plazos` | CTS venía en los datos que pasó Héctor; un solo módulo para los depósitos evita un ítem de menú para una sola tabla |
 | 11 nov 2026 | CTS se ordena por la TREA mínima y muestra el rango mínimo – máximo. Los valores de 0 % que publica la SBS se muestran tal cual | Coherente con la nota de la SBS ("se registra la TREA mínima aplicable"); la máxima suele tener condiciones que la tabla no detalla |
@@ -87,6 +96,9 @@ Una línea por decisión. Lo más nuevo arriba.
 | 10 nov 2026 | Construcción por entregables sobre un esqueleto mínimo | Práctica validada (walking skeleton, Shape Up) |
 
 ## Pendientes
+- **Revisión posterior a E3 (necesita a Héctor):** qué se usa, qué sigue y en qué orden (E4 Mis reglas, Fundamentales, E5 a E8), y la decisión del contador de visitas.
+- Héctor: usar el simulador y Radar instalado como app al menos 3 veces para cerrar E2 y E3 según la definición de terminado.
+- Revisar las decisiones del 11 nov 2026 marcadas "Decidido por Claude".
 - Elegir la API de "Fundamentales" y confirmar sus límites y términos (lista de candidatas en `docs/backlog.md`); verla junto con la API de precios de E4.
 - Fijar en la revisión posterior a E3 el número de "Fundamentales" y su orden frente a E4 (Mis reglas).
 - Símbolos "sin datos en TradingView" por decidir: ninguno (11 nov 2026).

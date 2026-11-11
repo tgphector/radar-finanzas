@@ -49,35 +49,40 @@ Eres mi socio de desarrollo para construir Radar, una web personal de herramient
 Directo, breve, en español. Si mi idea complica el proyecto o choca con una decisión anterior, dímelo claro.
 
 ## Estado actual
-Actualizado: 11 nov 2026, cierre de la S2 de E2.
+Actualizado: 11 nov 2026, cierre de E2 y de lo construible de E3.
 
-**En curso:** E2 · Depósitos (plazo fijo y CTS). Sesiones 1 y 2 de 3 hechas.
+**En curso:** la **Revisión** posterior a E3. Necesita a Héctor: no hay ningún entregable abierto que Claude pueda avanzar solo.
 
-**Terminado:** E1 · Esqueleto + Mis gráficas (11 nov 2026).
+**Terminado**
+- E1 · Esqueleto + Mis gráficas (11 nov 2026).
+- E2 · Depósitos: plazo fijo y CTS (11 nov 2026). Falta solo que Héctor confirme que usó el simulador.
+- E3 · replanificado y construido (11 nov 2026): carga manual quincenal, `historial_tasas`, aviso de datos viejos, PWA. Faltan el uso de Héctor y la decisión del contador de visitas.
 
-**Hecho en E2**
-- Archivo "Radar · Base de datos" en Google Sheets con las hojas `tasas_pf`, `tasas_cts`, `fsd`, `fuentes` y `log`. Datos de la SBS al 11 nov 2026, todos de Lima: plazo fijo en soles (33 entidades), plazo fijo en dólares (32) y CTS (29). Monto del FSD cargado (vigente hasta el 30 nov 2026).
-- App web de Apps Script publicada por Héctor (`?recurso=tasas|cts|fsd`, caché de 5 minutos, solo lectura). Copia del código en `apps-script/`.
-- `js/config.js`, `js/datos.js` y `app.js` entregando los datos a los módulos.
-- Módulo "Depósitos" (`modulos/plazos/plazos.js`, dirección `#/plazos`): selectores Plazo fijo / CTS y Soles / Dólares, ranking por TREA con barra, fecha de los datos visible, nota de cobertura del FSD, ayudas "?" en TREA, CTS y FSD.
-- Revisado en la página publicada en laptop y celular. Fallas probadas en local: app web caída con y sin copia, hoja vacía, datos viejos, FSD sin monto.
+**Qué hay publicado**
+- Mis gráficas: favoritos, tabla por pestañas, chips, "Editar", gráfico grande con periodos y buscador.
+- Depósitos (`#/plazos`): ranking por TREA de plazo fijo (soles y dólares) y CTS, fecha de los datos visible, nota del FSD y simulador de plazo fijo con interés estimado.
+- Radar instalable como app y con uso sin conexión (última copia).
+- Datos: archivo "Radar · Base de datos" en Google Sheets (`tasas_pf`, `tasas_cts`, `historial_tasas`, `fsd`, `fuentes`, `log`) servido por la app web de Apps Script (`?recurso=tasas|cts|fsd`). Datos de la SBS al 11 nov 2026.
 
-**Próxima sesión (S3 de E2, la última del entregable)**
-1. Simulador: el usuario escribe un monto y elige la moneda; se calcula el interés estimado a 360 días con la TREA publicada para 10 000 y el resultado se marca como "estimado". El monto no se guarda en ningún archivo (es dato personal); como mucho, en el navegador.
-2. Pruebas finales de E2 contra la definición de terminado (sección 14 de `docs/arquitectura.md`).
-3. Si toca por fecha: carga quincenal de las tres tablas (hacia el 26 nov 2026) y monto nuevo del FSD (desde diciembre).
+**Próxima sesión: Revisión (1 sesión, con Héctor)**
+1. Qué se usa y qué no: Mis gráficas, Depósitos, simulador, app instalada.
+2. Revisar las decisiones del 11 nov 2026 marcadas "Decidido por Claude" en `docs/decisiones.md` (simulador, memoria del monto, PWA, historial, contador).
+3. Decidir el contador de visitas (opciones en `docs/backlog.md`, E3).
+4. Decidir qué entregable sigue y detallarlo: E4 Mis reglas, Fundamentales, E5 Tipo de cambio, E6 Calculadoras. Ninguno está detallado todavía.
+5. Si toca por fecha: carga quincenal de las tres tablas (hacia el 26 nov 2026) y monto nuevo del FSD (desde diciembre).
 
-**Decisiones que debo preguntarle a Héctor al iniciar la S3**
-1. Cómo se ve el simulador: una columna más en el ranking ("ganarías aprox.") o un bloque aparte encima de la tabla.
-2. Si el simulador aplica también a CTS o solo a plazo fijo.
-3. Si el monto escrito se recuerda en el navegador o se borra al salir.
-4. Confirmar que la tabla de plazo fijo en dólares es por US$ 10 000.
+**Lo que cada entregable siguiente necesita de Héctor antes de empezar**
+- E4 Mis reglas: las reglas que quiere seguir y elegir una API de precios con su clave (va en `PropertiesService`).
+- Fundamentales: elegir la API (candidatas en `docs/backlog.md`) y su clave.
+- E5 Tipo de cambio: definir la fuente del dato.
+- E6 Calculadoras: definir qué calculadoras; es el único que no necesita datos externos.
 
 **Notas técnicas para retomar**
-- La SBS bloquea a los robots (Incapsula): no se puede leer desde el entorno de Claude ni desde Apps Script. No intentar saltarse la protección. Los datos entran por PDF o capturas que pasa Héctor en el chat; un PDF impreso desde la página de la SBS se lee bien con `pdftotext -layout`. **E3 está por replanificar** (alternativas en `docs/backlog.md`).
-- Radar mantiene solo tres tablas de la SBS (ver arriba). No pedir otros montos ni regiones.
-- El archivo de Sheets se edita con el conector de Google Sheets (buscarlo en Drive por su título; su identificador no se guarda en el repositorio). Después de cambiar la hoja, la app web tarda hasta 5 minutos en reflejarlo por la caché.
-- Si se cambia `Api.gs` o `Utilidades.gs`, Héctor debe pegar el código nuevo y crear una versión nueva de la misma implementación (así la dirección `/exec` no cambia).
+- La SBS bloquea a los robots (Incapsula): no se puede leer desde el entorno de Claude ni desde Apps Script. No intentar saltarse la protección. Los datos entran por PDF que pasa Héctor; el procedimiento de carga está en `docs/arquitectura.md`, sección 12.
+- Radar mantiene solo tres tablas de la SBS, todas de Lima. No pedir otros montos ni regiones.
+- El archivo de Sheets se edita con el conector de Google Sheets (buscarlo en Drive por su título; su identificador no se guarda en el repositorio). Después de cambiar la hoja, la app web tarda hasta 5 minutos en reflejarlo.
+- Si se cambia `Api.gs` o `Utilidades.gs`, Héctor debe pegar el código nuevo y crear una versión nueva de la misma implementación.
+- Al agregar archivos nuevos a Radar, sumarlos a la lista `BASE` de `sw.js`.
 - Esta sesión en la nube no puede controlar la laptop de Héctor ni su navegador.
 - Entorno "radar-finanzas": permite TradingView, la página publicada, la SBS, `fsd.org.pe`, `script.google.com` y `script.googleusercontent.com`.
 - En las pruebas con navegador automático, simular una parte de la app web y dejar pasar el resto puede hacer fallar un pedido real; conviene simular todo o nada.
