@@ -27,6 +27,11 @@ export function fechaCorta(fecha = new Date()) {
   return `${fecha.getDate()} ${MESES[fecha.getMonth()]} ${fecha.getFullYear()}, ${hora}:${minuto}`;
 }
 
+// Fecha sin hora: "11 nov 2026". Para datos que tienen día pero no hora.
+export function fechaDia(fecha = new Date()) {
+  return `${fecha.getDate()} ${MESES[fecha.getMonth()]} ${fecha.getFullYear()}`;
+}
+
 // Encabezado de un módulo: título + la pregunta que responde.
 // "pregunta" puede ser texto o un elemento ya armado (por ejemplo, con un "?").
 export function encabezado(titulo, pregunta) {
@@ -54,10 +59,18 @@ export function tarjeta(claseExtra = "") {
 
 // Línea de fuente y fecha. Regla de producto: todo dato la lleva.
 // verbo: "actualizado" para datos propios, "cargado" para widgets.
-export function lineaFuente({ fuente, fecha, verbo = "actualizado", nota }) {
-  let texto = `Fuente: ${fuente} · ${verbo} ${fechaCorta(fecha)}`;
-  if (nota) texto += ` · ${nota}`;
-  return crear("p", { clase: "fuente", texto });
+// sinHora: muestra solo el día. url: convierte el nombre de la fuente en enlace.
+export function lineaFuente({ fuente, fecha, verbo = "actualizado", nota, sinHora = false, url }) {
+  const cuando = sinHora ? fechaDia(fecha) : fechaCorta(fecha);
+  const linea = crear("p", { clase: "fuente" });
+  if (url) {
+    linea.append("Fuente: ", crear("a", { texto: fuente, atributos: { href: url, target: "_blank", rel: "noopener" } }));
+  } else {
+    linea.append(`Fuente: ${fuente}`);
+  }
+  linea.append(` · ${verbo} ${cuando}`);
+  if (nota) linea.append(` · ${nota}`);
+  return linea;
 }
 
 // Aviso: mensaje claro cuando algo falla o todavía no existe.
@@ -164,5 +177,45 @@ export function interruptor(etiqueta, encendido, alCambiar, titulo) {
     elemento.setAttribute("aria-checked", String(nuevo));
     alCambiar(nuevo);
   });
+  return elemento;
+}
+
+// ------------------------------------------------------------
+// Piezas agregadas en E2
+// ------------------------------------------------------------
+
+// Etiqueta: dato corto y destacado (por ejemplo, la fecha de los datos).
+// alerta: true la pinta como advertencia (datos viejos).
+export function etiqueta(texto, { alerta = false } = {}) {
+  return crear("span", { clase: alerta ? "etiqueta etiqueta--alerta" : "etiqueta", texto });
+}
+
+// Tabla propia de Radar.
+// columnas: [{ titulo, clase }]  ·  filas: lista de listas; cada celda es
+// un texto o un elemento ya armado. "clase" se aplica a toda la columna
+// (por ejemplo "tabla__num" para alinear cifras a la derecha).
+export function tabla(columnas, filas, descripcion) {
+  const elemento = crear("table", { clase: "tabla" });
+  if (descripcion) elemento.append(crear("caption", { texto: descripcion }));
+
+  const cabecera = crear("tr");
+  for (const columna of columnas) {
+    cabecera.append(crear("th", { clase: columna.clase, texto: columna.titulo, atributos: { scope: "col" } }));
+  }
+  const thead = crear("thead");
+  thead.append(cabecera);
+
+  const tbody = crear("tbody");
+  for (const fila of filas) {
+    const tr = crear("tr");
+    fila.forEach((celda, i) => {
+      const td = crear("td", { clase: columnas[i].clase });
+      td.append(celda);
+      tr.append(td);
+    });
+    tbody.append(tr);
+  }
+
+  elemento.append(thead, tbody);
   return elemento;
 }

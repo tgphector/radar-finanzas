@@ -392,3 +392,126 @@
      :has() pregunta "¿este elemento contiene a tal otro?". */
   body:has(.panel) { overflow: hidden; }
 }
+
+/* ============================================================
+   Piezas agregadas en E2: etiqueta, tabla propia y barra de valor.
+   ============================================================ */
+
+/* Enlace dentro de la línea de fuente */
+.fuente a { color: var(--acento); }
+
+/* --- Etiqueta: dato corto y destacado (fecha de los datos) --- */
+.etiqueta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--acento);
+  border-radius: 999px;
+  background: var(--acento-suave);
+  color: var(--texto);
+  font-size: var(--t-chico);
+  font-weight: 600;
+}
+
+/* Advertencia (datos viejos): borde punteado y texto de aviso.
+   No usa verde ni rojo: esos colores son solo para subidas y bajadas. */
+.etiqueta--alerta {
+  border-style: dashed;
+  border-color: var(--texto-2);
+  background: none;
+}
+
+/* --- Tabla propia: dentro de una tarjeta, centrada como la de cotizaciones --- */
+.tarjeta--lista {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0;
+  overflow: hidden;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;   /* Cifras del mismo ancho: las columnas no bailan */
+}
+
+/* El título de la tabla es para lectores de pantalla; a la vista ya está arriba */
+.tabla caption {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.tabla th {
+  padding: 12px var(--e2);
+  border-bottom: 1px solid var(--borde);
+  color: var(--texto-2);
+  font-size: var(--t-chico);
+  font-weight: 400;
+  text-align: left;
+}
+
+.tabla td {
+  padding: 10px var(--e2);
+  border-bottom: 1px solid var(--borde);
+  vertical-align: middle;
+}
+
+.tabla tbody tr:last-child td { border-bottom: 0; }
+
+/* Columnas de cifras: a la derecha */
+.tabla .tabla__num { text-align: right; white-space: nowrap; }
+
+/* Columna angosta (puesto en el ranking) */
+.tabla .tabla__puesto {
+  width: 48px;
+  color: var(--texto-2);
+  text-align: right;
+}
+
+/* Segunda línea de una celda (por ejemplo, el tipo de entidad) */
+.tabla__detalle {
+  display: block;
+  color: var(--texto-2);
+  font-size: var(--t-chico);
+}
+
+/* --- Barra de valor: muestra el tamaño de una cifra frente a la mayor ---
+   Cian (acento), nunca verde ni rojo. El ancho lo pone el módulo. */
+.barra-valor {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.barra-valor__riel {
+  flex: 1;
+  min-width: 40px;
+  max-width: 220px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--borde);
+  overflow: hidden;
+}
+
+.barra-valor__relleno {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--acento);
+}
+
+.barra-valor__cifra {
+  min-width: 64px;
+  font-weight: 600;
+  text-align: right;
+}
+
+@media (max-width: 599px) {
+  .tabla th, .tabla td { padding-left: 12px; padding-right: 12px; }
+  .tabla .tabla__puesto { width: 36px; }
+}

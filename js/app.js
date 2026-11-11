@@ -8,15 +8,37 @@
 // ============================================================
 
 import { crear, encabezado, aviso } from "./ui.js";
+import { pedir } from "./datos.js";
 import { graficas } from "../modulos/graficas/graficas.js";
+import { plazos } from "../modulos/plazos/plazos.js";
 
 // --- 1. Registro de módulos (el orden es el del menú) ---
 // Cada módulo cumple el contrato de docs/arquitectura.md, sección 7.
 // "proximamente: true" = aparece en el menú pero aún no está construido.
 const MODULOS = [
   graficas,
-  { id: "plazos", nombre: "Plazos fijos", icono: "◎", datos: [], proximamente: true }
+  plazos
 ];
+
+// --- Datos públicos de un módulo ---
+// Pide cada recurso que el módulo declara en "datos" (por ejemplo
+// ["tasas", "fsd"]) y arma un objeto { tasas: …, fsd: … }.
+// Si un recurso falla, en su lugar queda { error } y el módulo decide
+// qué mensaje mostrar: un recurso caído no tumba a los demás.
+// NUEVO: Promise.all espera varios pedidos a la vez en lugar de uno tras otro.
+async function pedirDatos(recursos) {
+  const respuestas = await Promise.all(recursos.map(async (recurso) => {
+    try {
+      return await pedir(recurso);
+    } catch (error) {
+      return { error };
+    }
+  }));
+  const datos = {};
+  recursos.forEach((recurso, i) => { datos[recurso] = respuestas[i]; });
+  return datos;
+}
+
 
 const menuLista = document.getElementById("menu-lista");
 const contenido = document.getElementById("contenido");
@@ -74,12 +96,31 @@ function mostrar() {
   }
 
   // Si un módulo falla, se muestra un mensaje y el resto de Radar sigue funcionando
-  try {
-    modulo.render(caja);
-  } catch (error) {
+  const fallo = (error) => {
     console.error(error);
     caja.replaceChildren(aviso("Este módulo no se pudo mostrar.", "Recarga la página. Si sigue igual, avísale a Héctor."));
+  };
+
+  // Módulo sin datos públicos (Mis gráficas): se dibuja de inmediato
+  if (!modulo.datos || !modulo.datos.length) {
+    try {
+      // Si render devuelve una promesa (función async), también se atrapan sus errores
+      Promise.resolve(modulo.render(caja)).catch(fallo);
+    } catch (error) {
+      fallo(error);
+    }
+    return;
   }
+
+  // Módulo con datos públicos: se avisa que está cargando, se piden los
+  // datos y recién entonces se dibuja. Si mientras tanto el usuario cambió
+  // de módulo, la caja ya no está en la página y no se dibuja nada.
+  caja.append(encabezado(modulo.nombre), crear("p", { clase: "nota", texto: "Cargando datos…" }));
+  pedirDatos(modulo.datos).then((datos) => {
+    if (!caja.isConnected) return;
+    caja.replaceChildren();
+    return modulo.render(caja, datos);
+  }).catch(fallo);
 }
 
 dibujarMenu();
