@@ -13,9 +13,9 @@ Después de cada entregable: usarlo al menos 3 veces antes de dar por cerrado el
 | E3 | Datos al día sin lectura automática + PWA (replanificado) | 1 de 3 usadas | **Terminado (11 nov 2026)** · uso confirmado por Héctor; el contador de visitas quedó sin construir |
 | Revisión | ¿Se usa? ¿Sigue el ritmo? ¿Qué sigue? | — | **Hecha en conversación (11 nov 2026):** Héctor pidió seguir con E4 y E5 y preguntó por E6 |
 | Fundamentales | Tabla propia con P/E, P/E forward y otras métricas (Apps Script + API + Sheets) | 3 | Tentativo · después de E3; su número y su orden frente a E4 se fijan en la revisión |
-| E4 | Mis reglas | 1 de 3 usadas | **Construido (11 nov 2026)** · falta publicar: depende de que Héctor actualice la app web |
-| E5 | Tipo de cambio | 1 de 3 usadas | **Construido (11 nov 2026)** · falta publicar: depende de que Héctor actualice la app web y permita la lectura del BCRP en la hoja |
-| E6 | Calculadoras | 3 | Siguiente · falta que Héctor elija cuáles (lista propuesta abajo) |
+| E4 | Mis reglas | 1 de 3 usadas | **Publicado (12 nov 2026)** · verificado con datos reales; falta que Héctor lo use |
+| E5 | Tipo de cambio | 1 de 3 usadas | **Publicado (12 nov 2026)** · verificado con datos reales; falta que Héctor lo use |
+| E6 | Calculadoras | 1 de 3 usadas | **Publicado (12 nov 2026)** · cuatro calculadoras; falta que Héctor las use |
 | E7 | Metas de ahorro | — | Tentativo |
 | E8 | Flujo de efectivo (Plantilla 1) | — | Tentativo |
 
@@ -70,41 +70,42 @@ El plan original (leer la SBS cada día con Apps Script) no es posible: la SBS p
 - **Pendiente de explorar, sin compromiso:** si la SBS publica las mismas tasas en un archivo descargable o en datos abiertos.
 - **Para darlo por terminado falta:** que Héctor instale Radar como app y lo use al menos 3 veces, y la decisión del contador.
 
-### E4 · Mis reglas (construido el 11 nov 2026)
+### E4 · Mis reglas (publicado el 12 nov 2026)
 Héctor pidió hacer "lo recomendado"; el diseño lo decidió Claude y queda aquí para revisarlo.
 
 - **Qué hace:** el usuario anota posiciones (símbolo y precio de compra) y las reglas que él mismo se puso: objetivo de subida en %, límite de bajada en % (opcional) y cada cuántos días revisar (opcional). Radar muestra la variación frente a la compra y avisa con una etiqueta: "Objetivo alcanzado", "Límite alcanzado" o "Toca revisar". No recomienda comprar ni vender.
 - **Privacidad:** las posiciones viven solo en el navegador (`radar.reglas.posiciones`). No se piden cantidades ni montos invertidos.
 - **Precios:** hoja `precios` con fórmulas `GOOGLEFINANCE` para los 45 símbolos (precio con retraso de hasta 20 minutos, cierre anterior, hora y moneda). Sin clave de API ni Apps Script propio: reemplaza a "ActualizarPrecios.gs + API con clave". Se usa el último precio con retraso, no el cierre del día anterior.
 - **Respaldo:** botones "Exportar" e "Importar" con un archivo JSON de todo lo personal de Radar (posiciones, favoritos, símbolos apagados, ajustes).
-- **Pendiente para publicarlo:** Héctor debe pegar el `Api.gs` y el `Utilidades.gs` nuevos y crear una versión nueva de la implementación. Probado en local con datos simulados; falta la prueba con datos reales.
+- **Publicado y verificado (12 nov 2026):** Héctor actualizó la app web; Apps Script lee bien los valores de `GOOGLEFINANCE` (45 símbolos con precio). Probado en la página publicada con posiciones de prueba, que se borraron al terminar.
 - **Riesgo:** Google no garantiza `GOOGLEFINANCE` ni autoriza redistribuir sus datos con fines profesionales. Radar es personal, sin fines de lucro y con `noindex`; si Google cambia las condiciones, se pasa a una API con clave (candidatas en la sección de Fundamentales).
 - **Fuera de alcance:** símbolos que no estén entre los 45, alertas por correo o notificación, y cálculo de ganancia en dinero.
 
-### E5 · Tipo de cambio (construido el 11 nov 2026)
+### E5 · Tipo de cambio (publicado el 12 nov 2026)
 Fuentes elegidas por Héctor: Google y BCRP. El diseño lo decidió Claude.
 
 - **Dólar hoy:** tres tarjetas. Sistema bancario (SBS) e interbancario, compra y venta, del BCRP (un dato por día hábil, con la variación frente al día anterior), y valor de mercado de Google Finance (con retraso).
 - **Conversor:** "Tengo soles" o "Tengo dólares" y un monto; muestra el resultado con cada tipo de cambio (venta para comprar dólares, compra para venderlos). El monto no se guarda.
 - **Últimos días:** tabla de los últimos 10 días hábiles del BCRP.
 - **Datos:** hoja `tipo_cambio` con una fórmula `IMPORTDATA` sobre la API pública de estadísticas del BCRP (series PD04637PD a PD04640PD), que se actualiza sola; y la fila USD/PEN de la hoja `precios`. Sin Apps Script propio ni activadores.
-- **Pendiente para publicarlo:** además de actualizar la app web, Héctor debe abrir la hoja `tipo_cambio` y pulsar "Permitir acceso" para que Sheets pueda leer el sitio del BCRP (hoy la fórmula da #REF!). Probado en local con los datos reales del BCRP copiados a mano; falta la prueba de punta a punta.
+- **Publicado y verificado (12 nov 2026):** Héctor permitió el acceso de la hoja al BCRP y la fórmula trae 33 días de datos. Probado en la página publicada: tarjetas, conversor y tabla.
 - **Fuera de alcance:** otras monedas, tipo de cambio de casas de cambio y gráfico histórico (USD/PEN ya se ve en Mis gráficas, pestaña Referencias).
 
-### E6 · Calculadoras (por definir con Héctor)
-Ninguna necesita datos externos. Lista propuesta, de la que Héctor elige:
+### E6 · Calculadoras (publicado el 12 nov 2026)
+Héctor eligió cuatro. Ninguna necesita datos externos y los montos no se guardan.
 
-| Calculadora | Qué responde |
-|---|---|
-| Interés compuesto | Cuánto tendré con un monto inicial, un aporte mensual, una tasa y un plazo |
-| Depósito a plazo | Interés de un monto con una TREA y un número de días cualquiera |
-| Conversor de tasas | Pasar entre tasa anual, mensual y diaria (TEA, TEM, TED) |
-| Préstamo | Cuota mensual, total pagado e intereses con monto, tasa y plazo; cronograma |
-| Rendimiento real | Cuánto rinde algo después de descontar la inflación |
-| Tiempo para una meta | En cuánto tiempo se llega a un monto, o cuánto aportar para llegar |
-| Resultado de una operación | Ganancia o pérdida de una compra y venta con comisiones, en dólares y soles |
+| Calculadora | Qué pide | Qué entrega |
+|---|---|---|
+| Interés compuesto | Monto inicial, aporte mensual, TEA y años | Monto final, total aportado, intereses y tabla año por año |
+| Resultado de una operación | Precio de compra y de venta, cantidad, comisiones y tipo de cambio | Costo, lo que se recibe, resultado en dólares y en %, y en soles |
+| Préstamo | Monto, TEA y meses | Cuota mensual fija, total pagado, intereses y cronograma (hasta 60 meses a la vista) |
+| Tiempo para una meta | Meta, lo que ya se tiene, TEA y aporte o plazo | En cuánto tiempo se llega, o cuánto aportar al mes |
 
-Recomendación para la primera tanda: interés compuesto, conversor de tasas, préstamo y resultado de una operación. "Tiempo para una meta" se cruza con E7 (Metas de ahorro) y "Préstamo" con la idea de Préstamos (TCEA): conviene decidir dónde vive cada una. Quedan fuera las calculadoras de impuestos y de beneficios laborales: dependen de normas que cambian y se acercan a una asesoría.
+- Todas trabajan con tasa efectiva anual (TEA) convertida a tasa mensual, y dicen sus supuestos: misma tasa todo el plazo, aportes al final de cada mes, sin impuestos, comisiones ni inflación.
+- "Resultado de una operación" propone el tipo de cambio de venta SBS del BCRP (se puede cambiar); si no hay dato, el campo queda vacío y no se muestra el resultado en soles.
+- "Préstamo" avisa que la cuota real será mayor y remite a la TCEA de cada entidad.
+- **No elegidas (quedan como ideas):** depósito a plazo con cualquier plazo, conversor de tasas y rendimiento real.
+- **Cruces por decidir:** "Tiempo para una meta" se parece a E7 (Metas de ahorro) y "Préstamo" a la idea de Préstamos (TCEA).
 
 ### Fundamentales (tentativo, después de E3)
 Idea de Héctor (11 nov 2026). Nada decidido todavía: se detalla en la revisión posterior a E3.

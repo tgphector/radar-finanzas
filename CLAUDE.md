@@ -49,33 +49,32 @@ Eres mi socio de desarrollo para construir Radar, una web personal de herramient
 Directo, breve, en español. Si mi idea complica el proyecto o choca con una decisión anterior, dímelo claro.
 
 ## Estado actual
-Actualizado: 11 nov 2026, E4 y E5 construidos y a la espera de dos pasos de Héctor para publicarlos.
+Actualizado: 12 nov 2026, E4, E5 y E6 publicados.
 
-**En curso:** E4 · Mis reglas y E5 · Tipo de cambio. Están construidos y probados en local con datos simulados, **en la rama de trabajo, no en `main`**. Para publicarlos falta que Héctor haga dos pasos (abajo).
+**En curso:** ningún entregable abierto. Toca decidir con Héctor qué sigue.
 
-**Terminado y publicado**
-- E1 · Esqueleto + Mis gráficas.
-- E2 · Depósitos: plazo fijo y CTS, con simulador.
-- E3 · Carga manual quincenal, `historial_tasas`, aviso de datos viejos y PWA (replanificado; sin contador de visitas).
+**Publicado** (todo en `main` y verificado en la página)
+- E1 · Mis gráficas: favoritos, tabla por pestañas, chips, "Editar", gráfico grande con periodos y buscador.
+- E2 · Depósitos (`#/plazos`): ranking por TREA de plazo fijo (soles y dólares) y CTS, fecha de los datos, nota del FSD y simulador de plazo fijo.
+- E3 · Carga manual quincenal, `historial_tasas`, aviso de datos viejos y PWA (sin contador de visitas).
+- E4 · Mis reglas (`#/reglas`): posiciones y reglas propias en el navegador, avisos, exportar e importar.
+- E5 · Tipo de cambio (`#/cambio`): BCRP (SBS e interbancario) y Google Finance, conversor y últimos días.
+- E6 · Calculadoras (`#/calculadoras`): interés compuesto, resultado de una operación, préstamo y tiempo para una meta.
 
-**Lo que falta para publicar E4 y E5**
-1. Héctor: en Apps Script, reemplazar `Api.gs` y `Utilidades.gs` por los de `apps-script/` y crear una versión nueva de la misma implementación. Desde esta versión los recursos se definen en la hoja `fuentes` y no hará falta republicar para sumar otro.
-2. Héctor: abrir la hoja `tipo_cambio` del archivo y pulsar "Permitir acceso" (hoy la fórmula del BCRP da #REF!).
-3. Claude: comprobar que la app web entrega `precios` y `tc` con datos reales (en especial que Apps Script lee bien los valores de `GOOGLEFINANCE`), probar los dos módulos en local con datos reales, pasar la rama a `main` y verificar en la página publicada. Si la rama y `main` difieren al iniciar la sesión, es por esto.
-
-**Después: E6 · Calculadoras.** Falta que Héctor elija cuáles; la lista propuesta y la recomendación están en `docs/backlog.md`.
+E1, E2 y E3 están terminados con el uso confirmado por Héctor. **E4, E5 y E6 necesitan que Héctor los use al menos 3 veces** para darlos por terminados.
 
 **Decisiones abiertas con Héctor**
-1. Qué calculadoras entran en E6.
-2. Revisar las decisiones del 11 nov 2026 marcadas "Decidido por Claude" en `docs/decisiones.md` (diseño de Mis reglas, precios desde `GOOGLEFINANCE`, tipo de cambio, simulador, PWA).
+1. Qué sigue: Fundamentales (necesita elegir una API y su clave), E7 Metas de ahorro, E8 Flujo de efectivo (ninguno está detallado) o las mejoras menores del backlog.
+2. Revisar las decisiones marcadas "Decidido por Claude" en `docs/decisiones.md` (Mis reglas, precios desde `GOOGLEFINANCE`, tipo de cambio, calculadoras, simulador, PWA).
 3. Contador de visitas (opciones en `docs/backlog.md`, E3).
 
 **Notas técnicas para retomar**
 - Hoja de Sheets "Radar · Base de datos": `tasas_pf`, `tasas_cts`, `historial_tasas`, `precios` (fórmulas `GOOGLEFINANCE`), `tipo_cambio` (fórmula `IMPORTDATA` del BCRP), `fsd`, `fuentes`, `log`. Se edita con el conector de Google Sheets (buscarla en Drive por su título; su identificador no va en el repositorio). La app web tarda hasta 5 minutos en reflejar un cambio.
+- La app web es genérica: para sumar un recurso basta una fila en `fuentes` con su `hoja`; no hay que republicar. Si se cambia `Api.gs` o `Utilidades.gs`, Héctor pega el código y crea una versión nueva de la misma implementación.
 - La SBS bloquea a los robots: no se puede leer desde el entorno de Claude ni desde Apps Script. No intentar saltarse la protección. Los datos de depósitos entran por PDF que pasa Héctor; procedimiento en `docs/arquitectura.md`, sección 12. Solo tres tablas, todas de Lima.
-- La API de estadísticas del BCRP sí responde sin protección (`estadisticas.bcrp.gob.pe/estadisticas/series/api/<series>/<formato>/<desde>/<hasta>/esp`).
 - Fechas pendientes: carga quincenal de la SBS hacia el 26 nov 2026; monto del FSD nuevo desde diciembre.
-- Al agregar archivos nuevos a Radar, sumarlos a la lista `BASE` de `sw.js` y cambiar el nombre `CACHE`.
+- Al agregar archivos nuevos a Radar, sumarlos a la lista `BASE` de `sw.js` y cambiar el nombre `CACHE` (hoy `radar-v3`).
+- El menú tiene cinco módulos; en celular ya ocupa todo el ancho de la barra inferior. Un sexto módulo obliga a rediseñar el menú del celular.
 - Esta sesión en la nube no puede controlar la laptop de Héctor ni su navegador.
 - Entorno "radar-finanzas": permite TradingView, la página publicada, la SBS, `fsd.org.pe`, `estadisticas.bcrp.gob.pe`, `script.google.com` y `script.googleusercontent.com`.
 - En las pruebas con navegador automático, para simular solo algunos recursos de la app web conviene responder los demás con `route.fetch()` y `fulfill`, no con `continue()`.

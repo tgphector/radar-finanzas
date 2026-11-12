@@ -4,6 +4,11 @@ Una línea por decisión. Lo más nuevo arriba.
 
 | Fecha | Decisión | Motivo |
 |---|---|---|
+| 12 nov 2026 | E4 Mis reglas, E5 Tipo de cambio y E6 Calculadoras publicados y verificados en la página. Falta el uso de Héctor para darlos por terminados | Héctor actualizó la app web y permitió el acceso de la hoja al BCRP |
+| 12 nov 2026 | E6: cuatro calculadoras elegidas por Héctor (interés compuesto, resultado de una operación, préstamo, tiempo para una meta) en un módulo "Calculadoras" con pestañas. Se recuerda la última calculadora abierta, nunca los montos | Elección de Héctor; los montos son datos personales y aquí no hace falta recordarlos |
+| 12 nov 2026 | Las calculadoras usan TEA convertida a tasa mensual, aportes al final de cada mes y cuota fija (método francés) en el préstamo. No muestran símbolo de moneda salvo en "Resultado de una operación" (dólares y soles) | Decidido por Claude: es la convención de las tasas que publican las entidades en Perú; sin moneda sirven para soles o dólares |
+| 12 nov 2026 | Comprobado: Apps Script lee los valores actuales de `GOOGLEFINANCE` y la fórmula `IMPORTDATA` del BCRP funciona después de pulsar "Permitir acceso" | Eran los dos riesgos abiertos de E4 y E5 |
+| 12 nov 2026 | Las tablas con más columnas que el ancho del celular se deslizan dentro de su tarjeta (`tarjeta--lista`) | El cronograma del préstamo tiene cinco columnas |
 | 11 nov 2026 | E2 y E3 cerrados con el uso confirmado por Héctor. La tabla de plazo fijo en dólares es por US$ 10 000 (confirmado) | Cierre de entregables |
 | 11 nov 2026 | Orden después de E3: E4 Mis reglas y E5 Tipo de cambio (construidos juntos), luego E6 Calculadoras. Reemplaza a la revisión formal | Decisión de Héctor en conversación |
 | 11 nov 2026 | **Precios desde `GOOGLEFINANCE` en la hoja `precios`**, sin API con clave ni `ActualizarPrecios.gs`. Reemplaza a "Precios para Mis reglas vía API con clave en PropertiesService" | Decidido por Claude: no exige cuenta ni clave, se actualiza solo y la app web ya sabe leer hojas. Riesgo anotado en el backlog (condiciones de uso de Google) |
@@ -107,8 +112,8 @@ Una línea por decisión. Lo más nuevo arriba.
 | 10 nov 2026 | Construcción por entregables sobre un esqueleto mínimo | Práctica validada (walking skeleton, Shape Up) |
 
 ## Pendientes
-- **Para publicar E4 y E5 (Héctor):** pegar `Api.gs` y `Utilidades.gs` nuevos y crear una versión nueva de la implementación; abrir la hoja `tipo_cambio` y pulsar "Permitir acceso". Después Claude verifica con datos reales y pasa los módulos a `main`.
-- Elegir las calculadoras de E6 (lista en `docs/backlog.md`).
+- Héctor: usar Mis reglas, Tipo de cambio y Calculadoras al menos 3 veces para darlos por terminados.
+- Decidir qué sigue: Fundamentales, E7 Metas de ahorro, E8 Flujo de efectivo o las mejoras menores.
 - Contador de visitas: sigue sin decidir (opciones en `docs/backlog.md`, E3).
 - Revisar las decisiones del 11 nov 2026 marcadas "Decidido por Claude".
 - Elegir la API de "Fundamentales" y confirmar sus límites y términos (lista de candidatas en `docs/backlog.md`); verla junto con la API de precios de E4.

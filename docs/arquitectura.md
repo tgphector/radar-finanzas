@@ -1,4 +1,6 @@
-# Arquitectura de Radar (v10, 11 nov 2026 · E4 y E5 construidos)
+# Arquitectura de Radar (v11, 12 nov 2026 · E4, E5 y E6 publicados)
+
+Cambios de v11: módulo Calculadoras; E4 y E5 verificados con datos reales.
 
 Cambios de v10: hojas `precios` y `tipo_cambio` con fórmulas, `Api.gs` genérico (recursos definidos en `fuentes`), módulos Mis reglas y Tipo de cambio, respaldo con exportar e importar.
 
@@ -112,6 +114,8 @@ radar-finanzas/
 │   ├── graficas/
 │   │   ├── graficas.js        #                                                         (E1 ✔)
 │   │   └── simbolos.json      # Símbolos por pestaña y favoritos por defecto            (E1 ✔)
+│   ├── calculadoras/
+│   │   └── calculadoras.js    # Módulo "Calculadoras"                                  (E6 ✔)
 │   ├── reglas/
 │   │   └── reglas.js          # Módulo "Mis reglas"                                    (E4 ✔)
 │   ├── cambio/
@@ -276,6 +280,13 @@ Reglas:
 - **Últimos días:** tabla de los últimos 10 días con dato.
 - El BCRP escribe las fechas como "10.Nov.26" y los días sin dato como "n.d."; el módulo los interpreta y descarta.
 - **Fallas cubiertas:** falta una de las dos fuentes (se muestra la otra con una nota), faltan las dos, copia guardada.
+
+## 11e. Módulo Calculadoras
+
+- Archivo `modulos/calculadoras/calculadoras.js`; identificador `calculadoras`, dirección `#/calculadoras`. Pide el recurso `tc` solo para proponer un tipo de cambio; si falla, todo funciona igual.
+- Cuatro calculadoras en pestañas: interés compuesto, resultado de una operación, préstamo y tiempo para una meta. Se recuerda la última abierta en `radar.calculadoras.abierta`; los montos no se guardan.
+- **Fórmulas:** tasa mensual = (1 + TEA)^(1/12) − 1. Saldo futuro = inicial × (1 + i)^n + aporte × ((1 + i)^n − 1) / i. Cuota fija = monto × i / (1 − (1 + i)^−n). Con tasa 0 se usan las versiones sin interés. "Tiempo para una meta" avanza mes a mes hasta 1200 meses.
+- Cada calculadora muestra tres tarjetas de resultado, una tabla cuando aplica y una nota con sus supuestos. Solo "Resultado de una operación" usa verde y rojo, con flecha y signo.
 
 ## 12. Operación
 - **Carga quincenal de tasas (manual).** La SBS no se puede leer con un script. Pasos: (1) Héctor imprime a PDF, desde el aplicativo de la SBS, las tres tablas de Lima (plazo fijo en soles por S/ 10 000 a 360 días, plazo fijo en dólares por US$ 10 000 a 360 días y CTS) y las pasa en el chat; (2) Claude lee los PDF (`pdftotext -layout`), compara el número de entidades con la carga anterior y reemplaza `tasas_pf` y `tasas_cts` con el conector de Sheets; (3) copia las filas nuevas al final de `historial_tasas`; (4) actualiza `actualizado` en `fuentes`; (5) revisa la página publicada pasados 5 minutos (caché de la app web). Si un PDF viene incompleto, no se reemplaza nada.
