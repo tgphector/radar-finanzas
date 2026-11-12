@@ -427,7 +427,9 @@
   max-width: 780px;
   margin: 0 auto;
   padding: 0;
-  overflow: hidden;
+  /* Si una tabla tiene más columnas de las que caben (celular), se desliza de lado dentro de su tarjeta */
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .tabla {
@@ -729,3 +731,6 @@
 /* Resultado de un cálculo: cifra destacada dentro de una línea */
 .resultado { font-variant-numeric: tabular-nums; }
 .resultado strong { color: var(--texto); font-size: 1.125rem; }
+
+/* Un campo oculto (atributo hidden) no debe verse aunque .campo use display: inline-flex */
+.campo[hidden] { display: none; }

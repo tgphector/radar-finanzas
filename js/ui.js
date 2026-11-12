@@ -229,7 +229,8 @@ export function tabla(columnas, filas, descripcion) {
 // Devuelve { elemento, ponerPrefijo(texto), ponerValor(numero | null) }.
 // inputmode="decimal" hace que el celular muestre el teclado de números.
 // "sufijo" va después del número (por ejemplo "%" o "días") y "ejemplo" es el texto gris de muestra.
-export function campoMonto(etiquetaTexto, { valor = null, prefijo = "", sufijo = "", ejemplo = "10 000", maximo = 999999999, alCambiar } = {}) {
+// "decimales" es cuántos decimales se aceptan y "permiteCero" deja escribir 0 (por ejemplo, un aporte de 0).
+export function campoMonto(etiquetaTexto, { valor = null, prefijo = "", sufijo = "", ejemplo = "10 000", maximo = 999999999, decimales = 2, permiteCero = false, alCambiar } = {}) {
   const elemento = crear("label", { clase: "campo" });
   const caja = crear("span", { clase: "campo__caja" });
   const marca = crear("span", { clase: "campo__prefijo", texto: prefijo });
@@ -243,9 +244,10 @@ export function campoMonto(etiquetaTexto, { valor = null, prefijo = "", sufijo =
   // Del texto escrito se toma solo el número: "10 000", "10,000" y "10000" valen lo mismo
   const leer = () => {
     const limpio = entrada.value.replace(/[\s,]/g, "");
-    if (!/^\d+(\.\d{0,2})?$/.test(limpio)) return null;
+    if (!new RegExp(`^\\d+(\\.\\d{0,${decimales}})?$`).test(limpio)) return null;
     const numero = Number(limpio);
-    return numero > 0 && numero <= maximo ? numero : null;
+    const minimoOk = permiteCero ? numero >= 0 : numero > 0;
+    return minimoOk && numero <= maximo ? numero : null;
   };
 
   entrada.addEventListener("input", () => {

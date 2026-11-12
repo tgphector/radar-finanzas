@@ -17,7 +17,7 @@
 // ============================================================
 
 // Cambiar este nombre borra las copias anteriores al activar la versión nueva
-const CACHE = "radar-v2";
+const CACHE = "radar-v3";
 
 // Archivos que se guardan al instalar, para que la primera visita sin
 // conexión ya funcione. Rutas relativas a la carpeta de Radar.
@@ -38,6 +38,7 @@ const BASE = [
   "modulos/plazos/plazos.js",
   "modulos/reglas/reglas.js",
   "modulos/cambio/cambio.js",
+  "modulos/calculadoras/calculadoras.js",
   "icons/icono-192.png"
 ];
 

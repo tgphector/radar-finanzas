@@ -13,6 +13,7 @@ import { graficas } from "../modulos/graficas/graficas.js";
 import { plazos } from "../modulos/plazos/plazos.js";
 import { reglas } from "../modulos/reglas/reglas.js";
 import { cambio } from "../modulos/cambio/cambio.js";
+import { calculadoras } from "../modulos/calculadoras/calculadoras.js";
 
 // --- 1. Registro de módulos (el orden es el del menú) ---
 // Cada módulo cumple el contrato de docs/arquitectura.md, sección 7.
@@ -21,7 +22,8 @@ const MODULOS = [
   graficas,
   plazos,
   reglas,
-  cambio
+  cambio,
+  calculadoras
 ];
 
 // --- Datos públicos de un módulo ---
